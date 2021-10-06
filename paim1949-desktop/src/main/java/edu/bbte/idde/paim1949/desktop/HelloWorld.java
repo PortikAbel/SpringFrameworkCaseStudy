@@ -1,4 +1,4 @@
-package edu.bbte.idde.paim1949.frontend;
+package edu.bbte.idde.paim1949.desktop;
 
 import edu.bbte.idde.paim1949.backend.ExampleLibrary;
 import java.io.IOException;
