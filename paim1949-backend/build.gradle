@@ -3,3 +3,15 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     runtimeOnly group: 'ch.qos.logback', name:'logback-classic', version:'1.2.3'
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'edu.bbte.idde.paim1949'
+            artifactId = 'paim1949-desktop'
+            version = '1.0.0-SNAPSHOT'
+
+            from components.java
+        }
+    }
+}

@@ -9,3 +9,15 @@ dependencies {
 application {
     mainClass = 'edu.bbte.idde.paim1949.desktop.TourManager'
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'edu.bbte.idde.paim1949'
+            artifactId = 'paim1949-backend'
+            version = '1.0.0-SNAPSHOT'
+
+            from components.java
+        }
+    }
+}
