@@ -13,8 +13,13 @@ public class TourManager {
         tourServer.create(new Tour(23.1f, 1587, Tour.SignShape.LINE, Tour.SignColour.RED, 2));
 
         tourServer.findAll();
+
         tourServer.findById(1L);
+
         tourServer.delete(1L);
         tourServer.findAll();
+
+        tourServer.update(0L, new Tour(12.3f, 787, Tour.SignShape.CIRCLE, Tour.SignColour.RED, 2));
+        tourServer.findById(0L);
     }
 }

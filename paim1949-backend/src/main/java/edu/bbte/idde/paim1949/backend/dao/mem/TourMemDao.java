@@ -43,9 +43,9 @@ public class TourMemDao implements TourDao {
         Tour oldTour = DATABASE.get(id);
         DATABASE.replace(id, tour);
 
-        LOG.info("Tour being updated.\n"
-                + "old value: " + oldTour
-                + "new value: " + tour
+        LOG.info("Tour being updated."
+                + "\n\told value: " + oldTour
+                + "\n\tnew value: " + tour
         );
         return oldTour;
     }
