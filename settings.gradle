@@ -1,0 +1,2 @@
+// almodulok definiciója relatív elérési útvonal szerint
+include 'paim1949-backend', 'paim1949-desktop'

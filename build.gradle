@@ -1,0 +1,20 @@
+// ez a kódrészlet minden projektre érvényes
+allprojects {
+    group = 'edu.bbte.idde.paim1949'
+    version = '1.0-SNAPSHOT'
+}
+
+// ez a kódrészlet minden alprojektre érvényes
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    apply plugin: 'application'
+    apply from: "$rootDir/lint.gradle"
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+}
