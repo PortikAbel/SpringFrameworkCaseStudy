@@ -4,9 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Tour extends BaseEntity {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Tour.class);
-
     public enum SignShape { CIRCLE, TRIANGLE, LINE }
 
     public enum SignColour { RED, BLUE, YELLOW }
@@ -27,8 +24,6 @@ public class Tour extends BaseEntity {
         this.signShape = signShape;
         this.signColour = signColour;
         this.daysRecommended = daysRecommended;
-
-        LOG.debug("Tour initialized");
     }
 
     public Float getDistanceInKm() {
