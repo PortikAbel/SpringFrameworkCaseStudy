@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath group: 'gradle.plugin.com.github.spotbugs.snom', name: 'spotbugs-gradle-plugin', version: '4.5.1'
+        classpath group: 'gradle.plugin.com.github.spotbugs.snom', name: 'spotbugs-gradle-plugin', version: '4.7.1'
         classpath group: 'se.bjurr.violations', name: 'violations-gradle-plugin', version: '1.37'
     }
 }
@@ -27,7 +27,7 @@ checkstyle {
 }
 
 spotbugs {
-    toolVersion = '4.1.1'
+    toolVersion = '4.4.2'
     ignoreFailures = true
     effort = 'max'
     reportLevel = 'low'
@@ -35,7 +35,7 @@ spotbugs {
 }
 
 pmd {
-    toolVersion = '6.17.0'
+    toolVersion = '6.39.0'
     ignoreFailures = true
     ruleSetFiles = files("${configDir}/pmd-ruleset.xml")
     ruleSets = []
