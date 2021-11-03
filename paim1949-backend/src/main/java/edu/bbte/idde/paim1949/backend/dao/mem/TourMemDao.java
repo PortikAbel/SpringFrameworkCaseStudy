@@ -12,8 +12,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class TourMemDao implements TourDao {
     private static final Map<Long, Tour> DATABASE = new ConcurrentHashMap<>();
-    private static final AtomicLong NEXTID = new AtomicLong();
+    private static final AtomicLong NEXT_ID = new AtomicLong();
     private static final Logger LOG = LoggerFactory.getLogger(TourMemDao.class);
+
+    static {
+        TourDao tourDao = new TourMemDao();
+        tourDao.create(new Tour(12.3f, 787, Tour.SignShape.CIRCLE, Tour.SignColour.RED, 1));
+        tourDao.create(new Tour(26.4f, 1733, Tour.SignShape.TRIANGLE, Tour.SignColour.YELLOW, 2));
+        tourDao.create(new Tour(23.1f, 1587, Tour.SignShape.LINE, Tour.SignColour.RED, 2));
+    }
 
     @Override
     public Collection<Tour> findAll() {
@@ -30,7 +37,7 @@ public class TourMemDao implements TourDao {
 
     @Override
     public Tour create(Tour tour) {
-        Long nextId = NEXTID.getAndIncrement();
+        Long nextId = NEXT_ID.getAndIncrement();
         tour.setId(nextId);
         DATABASE.put(nextId, tour);
 
