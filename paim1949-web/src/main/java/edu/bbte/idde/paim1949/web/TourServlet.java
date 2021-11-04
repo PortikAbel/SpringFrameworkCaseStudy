@@ -3,7 +3,7 @@ package edu.bbte.idde.paim1949.web;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
-import edu.bbte.idde.paim1949.backend.dao.mem.TourMemDao;
+import edu.bbte.idde.paim1949.backend.dao.TourDaoFactory;
 import edu.bbte.idde.paim1949.backend.model.Tour;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,9 +20,10 @@ public class TourServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(TourServlet.class);
     private TourDao tourDao;
     private ObjectMapper objectMapper;
+
     @Override
     public void init() throws ServletException {
-        tourDao = new TourMemDao();
+        tourDao = TourDaoFactory.getTourMemDao();
         objectMapper = ObjectMapperFactory.getObjectMapper();
         LOG.info("Server initialized");
     }
