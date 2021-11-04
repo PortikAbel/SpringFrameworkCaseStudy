@@ -37,7 +37,10 @@ public class TourServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idParam = req.getParameter("id");
-        if (idParam != null) {
+        if (idParam == null) {
+            resp.setHeader("Content-Type", "application/json");
+            objectMapper.writeValue(resp.getOutputStream(), tourDao.findAll());
+        } else {
             try {
                 Long id = Long.parseLong(idParam);
                 Tour tour = tourDao.findById(id);
@@ -53,9 +56,6 @@ public class TourServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println("Invalid id");
             }
-        } else {
-            resp.setHeader("Content-Type", "application/json");
-            objectMapper.writeValue(resp.getOutputStream(), tourDao.findAll());
         }
     }
 

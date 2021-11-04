@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 
@@ -28,10 +27,12 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("password");
 
         if (USERNAME.equals(username) && PASSWORD.equals(password)) {
+            LOG.info("login successful");
             req.getSession().setAttribute("username", username);
             req.getSession().removeAttribute("error");
             resp.sendRedirect("index");
         } else {
+            LOG.info("login unsuccessful");
             req.getSession().setAttribute("error", true);
             resp.sendRedirect("login");
         }

@@ -17,7 +17,8 @@ public class IndexFilter extends HttpFilter {
     private static final Logger LOG = LoggerFactory.getLogger(IndexFilter.class);
 
     @Override
-    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
         if (req.getRequestURI().startsWith("/static")) {
             chain.doFilter(req, res);
         }
