@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'edu.bbte.idde.paim1949'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+    runtimeOnly 'ch.qos.logback:logback-classic:1.2.6'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
+    implementation 'org.slf4j:slf4j-api:1.7.32'
+    implementation project(':paim1949-backend')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def deploymentName = 'paim1949-web'
+def tomcatHome = System.getenv('CATALINA_HOME')
+
+task deploy(type: Copy, dependsOn: 'war') {
+    doFirst {
+        if (!tomcatHome) {
+            throw new InvalidUserDataException("Tomcat home (CATALINA_HOME) env variable not set")
+        }
+    }
+    from war.archiveFile
+    rename war.archiveFileName.get(),"${deploymentName}.war"
+    into "${tomcatHome}/webapps"
+}
+
+task undeploy(type: Delete) {
+    doFirst {
+        if (!tomcatHome) {
+            throw new InvalidUserDataException("Tomcat home (CATALINA_HOME) env variable not set")
+        }
+    }
+    delete "${tomcatHome}/webapps/${deploymentName}.war"
+}
