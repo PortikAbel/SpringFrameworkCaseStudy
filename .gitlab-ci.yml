@@ -1,0 +1,14 @@
+stages:
+  - lint
+
+lint:
+  stage: lint
+  image: csabasulyok/gradle:7.2-jdk16-alpine
+  before_script:
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+  script:
+    # lint and compile projects
+    - gradle check build --console=verbose --no-daemon
+  cache:
+    paths:
+      - .gradle

@@ -1,10 +1,7 @@
 package edu.bbte.idde.paim1949.backend.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Tour extends BaseEntity {
-    public enum SignShape { CIRCLE, TRIANGLE, LINE }
+    public enum SignShape { CIRCLE, TRIANGLE, LINE, CROSS }
 
     public enum SignColour { RED, BLUE, YELLOW }
 
@@ -13,6 +10,10 @@ public class Tour extends BaseEntity {
     private SignShape signShape;
     private SignColour signColour;
     private Integer daysRecommended;
+
+    public Tour() {
+        super();
+    }
 
     public Tour(Float distanceInKm, Integer elevationInM,
                 SignShape signShape, SignColour signColour,

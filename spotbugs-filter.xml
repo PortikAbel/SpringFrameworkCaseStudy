@@ -22,6 +22,7 @@
             <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
             <Bug pattern="EI_EXPOSE_REP"/>
             <Bug pattern="EI_EXPOSE_REP2"/>
+            <Bug pattern="MS_EXPOSE_REP"/>
             <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
             <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
             <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
