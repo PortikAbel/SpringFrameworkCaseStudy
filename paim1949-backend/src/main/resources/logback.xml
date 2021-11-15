@@ -19,7 +19,7 @@
         </layout>
     </appender>
     <!-- named logger used by every class in our project -->
-    <logger name="edu.bbte.idde.paim1949.backend" level="debug" additivity="false">
+    <logger name="edu.bbte.idde.paim1949" level="debug" additivity="false">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </logger>

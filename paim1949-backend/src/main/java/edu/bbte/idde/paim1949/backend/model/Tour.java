@@ -22,6 +22,10 @@ public class Tour extends BaseEntity {
     private Long regionId;
     private Collection<Long> refugeIds;
 
+    public Tour() {
+        super();
+    }
+
     public Tour(Float distanceInKm, Integer elevationInM,
                 SignShape signShape, SignColour signColour,
                 Integer daysRecommended) {
