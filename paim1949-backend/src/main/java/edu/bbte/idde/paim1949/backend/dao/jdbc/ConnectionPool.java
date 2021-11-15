@@ -13,21 +13,21 @@ import java.util.LinkedList;
 @Slf4j
 public final class ConnectionPool {
     private static ConnectionPool instance;
-    private static Integer POOL_SIZE;
+    private Integer poolSize = 1;
     private final Deque<Connection> pool = new LinkedList<>();
 
     private ConnectionPool() {
         try {
             Class.forName(ConfigFactory.getConfig().getDriverClass());
             JdbcConfig jdbcConfig = ConfigFactory.getConfig().getConnection();
-            POOL_SIZE = jdbcConfig.getPoolSize();
-            for (int i = 0; i < POOL_SIZE; i++) {
+            poolSize = jdbcConfig.getPoolSize();
+            for (int i = 0; i < poolSize; i++) {
                 pool.push(DriverManager.getConnection(
                         jdbcConfig.getUrl(),
                         jdbcConfig.getUser(),
                         jdbcConfig.getPassword()));
             }
-            log.info("Connection pool of size {} initialized", POOL_SIZE);
+            log.info("Connection pool of size {} initialized", poolSize);
         } catch (SQLException e) {
             log.error("Database connection could not be established.");
         } catch (ClassNotFoundException e) {
@@ -44,7 +44,7 @@ public final class ConnectionPool {
     }
 
     public synchronized void returnConnection(Connection connection) {
-        if (pool.size() < POOL_SIZE) {
+        if (pool.size() < poolSize) {
             log.debug("Returning connection to pool");
             pool.push(connection);
         }

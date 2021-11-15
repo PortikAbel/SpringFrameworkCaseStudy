@@ -11,49 +11,49 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
-    private final Map<Long, T> DATABASE = new ConcurrentHashMap<>();
+    private final Map<Long, T> dataBase = new ConcurrentHashMap<>();
     private static final AtomicLong NEXT_ID = new AtomicLong();
 
     @Override
     public Collection<T> findAll() {
         log.info("All models requested");
-        return DATABASE.values();
+        return dataBase.values();
     }
 
     @Override
     public T findById(Long id) {
-        T t = DATABASE.get(id);
-        log.info("Model requested: " + t);
-        return t;
+        T value = dataBase.get(id);
+        log.info("Model requested: " + value);
+        return value;
     }
 
     @Override
-    public T create(T t) {
+    public T create(T value) {
         Long nextId = NEXT_ID.getAndIncrement();
-        t.setId(nextId);
-        DATABASE.put(nextId, t);
+        value.setId(nextId);
+        dataBase.put(nextId, value);
 
-        log.info("Model created: " + t);
-        return t;
+        log.info("Model created: " + value);
+        return value;
     }
 
     @Override
-    public T update(Long id, T t) {
-        T oldT = DATABASE.get(id);
-        DATABASE.replace(id, t);
+    public T update(Long id, T value) {
+        T oldT = dataBase.get(id);
+        dataBase.replace(id, value);
 
         log.info("Model being updated."
                 + "\n\told value: " + oldT
-                + "\n\tnew value: " + t
+                + "\n\tnew value: " + value
         );
         return oldT;
     }
 
     @Override
     public T delete(Long id) {
-        T t = DATABASE.remove(id);
+        T value = dataBase.remove(id);
 
-        log.info("Model removed: " + t);
-        return t;
+        log.info("Model removed: " + value);
+        return value;
     }
 }

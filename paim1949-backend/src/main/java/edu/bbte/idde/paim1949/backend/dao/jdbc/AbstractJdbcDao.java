@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -34,7 +35,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     public Collection<T> findAll() {
         StringBuilder selector = new StringBuilder("SELECT ");
         for (Field field: fields) {
-            selector.append(field.getName()).append(",");
+            selector.append(field.getName()).append(',');
         }
         selector.append("id FROM ").append(modelClass.getSimpleName());
         Collection<T> result = new ArrayList<>();
@@ -48,7 +49,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
                 for (Field field: fields) {
                     Object attribute = resultSet.getObject(field.getName(), field.getType());
                     String setterName = "set"
-                            + field.getName().substring(0, 1).toUpperCase()
+                            + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                             + field.getName().substring(1);
                     Method setter = modelClass.getDeclaredMethod(setterName, field.getType());
                     setter.invoke(selectedModel, attribute);
@@ -57,7 +58,10 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             }
         } catch (SQLException e) {
             log.error("SQL execution failed.");
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+        } catch (InvocationTargetException
+                | InstantiationException
+                | IllegalAccessException
+                | NoSuchMethodException e) {
             log.error("Could not instantiate from model class");
         }
         return result;
@@ -67,7 +71,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     public T findById(Long id) {
         StringBuilder selector = new StringBuilder("SELECT ");
         for (Field field: fields) {
-            selector.append(field.getName()).append(",");
+            selector.append(field.getName()).append(',');
         }
         selector.append("id FROM ").append(modelClass.getSimpleName());
         selector.append(" WHERE id=").append(id);
@@ -77,32 +81,37 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(selector.toString());
 
-            resultSet.next();
+            if (!resultSet.next()) {
+                return null;
+            }
             selectedModel = modelClass.getDeclaredConstructor().newInstance();
             selectedModel.setId(resultSet.getLong("id"));
             for (Field field: fields) {
                 Object attribute = resultSet.getObject(field.getName(), field.getType());
                 String setterName = "set"
-                        + field.getName().substring(0, 1).toUpperCase()
+                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + field.getName().substring(1);
                 Method setter = modelClass.getDeclaredMethod(setterName, field.getType());
                 setter.invoke(selectedModel, attribute);
             }
         } catch (SQLException e) {
             log.error("SQL execution failed.");
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+        } catch (InvocationTargetException
+                | InstantiationException
+                | IllegalAccessException
+                | NoSuchMethodException e) {
             log.error("Could not instantiate from model class");
         }
         return selectedModel;
     }
 
     @Override
-    public T create(T t) {
+    public T create(T value) {
         StringBuilder inserter = new StringBuilder("INSERT INTO ")
                 .append(modelClass.getSimpleName())
                 .append(" (");
         for (Field field: fields) {
-            inserter.append(field.getName()).append(",");
+            inserter.append(field.getName()).append(',');
         }
         inserter.append("id) VALUES (")
                 .append(IntStream.range(0, fields.length).mapToObj(i -> "?").collect(Collectors.joining(",")));
@@ -112,12 +121,12 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             int i = 1;
             for (Field field : fields) {
                 Method getter = modelClass.getDeclaredMethod("get"
-                        + field.getName().substring(0, 1).toUpperCase()
+                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + field.getName().substring(1));
-                Object getterResult = getter.invoke(t);
+                Object getterResult = getter.invoke(value);
                 insertStatement.setObject(i++, getterResult);
             }
-            insertStatement.setLong(i, t.getId());
+            insertStatement.setLong(i, value.getId());
             log.info("Executing statement");
             insertStatement.executeUpdate();
         } catch (SQLException e) {
@@ -125,11 +134,11 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             log.error("Could not instantiate from model class");
         }
-        return t;
+        return value;
     }
 
     @Override
-    public T update(Long id, T t) {
+    public T update(Long id, T value) {
         StringBuilder updater = new StringBuilder("UPDATE ")
                 .append(modelClass.getSimpleName())
                 .append(" SET ");
@@ -142,12 +151,12 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             int i = 1;
             for (Field field : fields) {
                 Method getter = modelClass.getDeclaredMethod("get"
-                        + field.getName().substring(0, 1).toUpperCase()
+                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + field.getName().substring(1));
-                Object getterResult = getter.invoke(t);
+                Object getterResult = getter.invoke(value);
                 updateStatement.setObject(i++, getterResult);
             }
-            updateStatement.setLong(i, t.getId());
+            updateStatement.setLong(i, value.getId());
             log.info("Executing statement");
             updateStatement.executeUpdate();
         } catch (SQLException e) {
@@ -155,7 +164,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             log.error("Could not instantiate from model class");
         }
-        return t;
+        return value;
     }
 
     @Override

@@ -11,6 +11,7 @@ import java.util.Collection;
 @ToString(callSuper = true)
 public class Tour extends BaseEntity {
     public enum SignShape { CIRCLE, TRIANGLE, LINE, CROSS }
+
     public enum SignColour { RED, BLUE, YELLOW }
 
     private Float distanceInKm;

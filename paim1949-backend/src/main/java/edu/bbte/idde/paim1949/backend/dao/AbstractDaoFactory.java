@@ -7,12 +7,12 @@ import edu.bbte.idde.paim1949.backend.dao.mem.MemDaoFactory;
 public abstract class AbstractDaoFactory {
     private static DaoFactory daoFactory;
 
-    public static DaoFactory getDaoFactory(){
+    public static synchronized DaoFactory getDaoFactory() {
         if (daoFactory == null) {
             String daoType = ConfigFactory.getConfig().getDaoType();
-            if(daoType.equalsIgnoreCase("mem")) {
+            if ("mem".equalsIgnoreCase(daoType)) {
                 daoFactory = new MemDaoFactory();
-            } else if (daoType.equalsIgnoreCase("jdbc")) {
+            } else if ("jdbc".equalsIgnoreCase(daoType)) {
                 daoFactory = new JdbcDaoFactory();
             }
         }
