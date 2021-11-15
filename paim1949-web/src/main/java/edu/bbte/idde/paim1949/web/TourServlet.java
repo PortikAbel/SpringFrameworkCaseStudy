@@ -2,8 +2,8 @@ package edu.bbte.idde.paim1949.web;
 
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.bbte.idde.paim1949.backend.dao.AbstractDaoFactory;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
-import edu.bbte.idde.paim1949.backend.dao.TourDaoFactory;
 import edu.bbte.idde.paim1949.backend.model.Tour;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,8 +22,8 @@ public class TourServlet extends HttpServlet {
     private ObjectMapper objectMapper;
 
     @Override
-    public void init() throws ServletException {
-        tourDao = TourDaoFactory.getTourMemDao();
+    public void init() {
+        tourDao = AbstractDaoFactory.getDaoFactory().getTourDao();
         objectMapper = ObjectMapperFactory.getObjectMapper();
         LOG.info("Server initialized");
     }
@@ -60,7 +60,7 @@ public class TourServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             Tour tour = objectMapper.readValue(req.getInputStream(), Tour.class);
             Tour createdTour = tourDao.create(tour);
@@ -73,7 +73,7 @@ public class TourServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idParam = req.getParameter("id");
         try {
             Long id = Long.parseLong(idParam);
@@ -93,7 +93,7 @@ public class TourServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idParam = req.getParameter("id");
         try {
             Long id = Long.parseLong(idParam);
