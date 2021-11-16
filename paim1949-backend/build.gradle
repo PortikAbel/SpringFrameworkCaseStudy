@@ -6,6 +6,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.0'
 
+    runtimeOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
+
     implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
 }

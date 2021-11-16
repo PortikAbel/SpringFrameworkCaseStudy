@@ -31,7 +31,7 @@ public final class ConnectionPool {
         } catch (SQLException e) {
             log.error("Database connection could not be established.");
         } catch (ClassNotFoundException e) {
-            log.error("Driver class not found.");
+            log.error("Driver class [{}] not found.", ConfigFactory.getConfig().getDriverClass());
         }
     }
 

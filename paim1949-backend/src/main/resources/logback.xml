@@ -2,21 +2,21 @@
 <configuration>
     <!-- appender with name STDOUT -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- print format (using date, thread, level, logger name and message -->
             <Pattern>
                 %d{dd-MM-yyyy HH:mm:ss} %-5level %logger{36} - %msg%n
             </Pattern>
-        </layout>
+        </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>../log/backend.log</file>
-        <layout class="ch.qos.logback.classic.PatternLayout">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- print format (using date, thread, level, logger name and message -->
             <Pattern>
                 %d{HH:mm:ss} %-5level %logger{36} - %msg%n
             </Pattern>
-        </layout>
+        </encoder>
     </appender>
     <!-- named logger used by every class in our project -->
     <logger name="edu.bbte.idde.paim1949" level="debug" additivity="false">

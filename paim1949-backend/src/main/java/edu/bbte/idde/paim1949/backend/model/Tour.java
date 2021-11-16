@@ -1,5 +1,6 @@
 package edu.bbte.idde.paim1949.backend.model;
 
+import edu.bbte.idde.paim1949.backend.annotation.IgnoreColumn;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,7 +20,9 @@ public class Tour extends BaseEntity {
     private SignShape signShape;
     private SignColour signColour;
     private Integer daysRecommended;
+    @IgnoreColumn
     private Long regionId;
+    @IgnoreColumn
     private Collection<Long> refugeIds;
 
     public Tour() {
@@ -36,5 +39,21 @@ public class Tour extends BaseEntity {
         this.signShape = signShape;
         this.signColour = signColour;
         this.daysRecommended = daysRecommended;
+    }
+
+    public String getSignShape() {
+        return signShape.name();
+    }
+
+    public void setSignShape(String signShape) {
+        this.signShape = SignShape.valueOf(signShape);
+    }
+
+    public String getSignColour() {
+        return signColour.name();
+    }
+
+    public void setSignColour(String signColour) {
+        this.signColour = SignColour.valueOf(signColour);
     }
 }
