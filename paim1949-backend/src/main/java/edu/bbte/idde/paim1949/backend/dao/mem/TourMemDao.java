@@ -4,6 +4,9 @@ import edu.bbte.idde.paim1949.backend.dao.TourDao;
 import edu.bbte.idde.paim1949.backend.model.Tour;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 @Slf4j
 public class TourMemDao extends AbstractMemDao<Tour> implements TourDao {
     public TourMemDao() {
@@ -11,5 +14,13 @@ public class TourMemDao extends AbstractMemDao<Tour> implements TourDao {
         this.create(new Tour(12.3f, 787, Tour.SignShape.CIRCLE, Tour.SignColour.RED, 1));
         this.create(new Tour(26.4f, 1733, Tour.SignShape.TRIANGLE, Tour.SignColour.YELLOW, 2));
         this.create(new Tour(23.1f, 1587, Tour.SignShape.LINE, Tour.SignColour.RED, 2));
+    }
+
+    @Override
+    public Collection<Tour> findByRegionId(Long regionId) {
+        log.info("Tours with region id {} requested", regionId);
+        return dataBase.values().stream()
+                .filter(tour -> tour.getRegionId().equals(regionId))
+                .collect(Collectors.toList());
     }
 }

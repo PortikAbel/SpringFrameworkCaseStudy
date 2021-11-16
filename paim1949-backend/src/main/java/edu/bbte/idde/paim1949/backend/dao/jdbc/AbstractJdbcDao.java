@@ -1,6 +1,7 @@
 package edu.bbte.idde.paim1949.backend.dao.jdbc;
 
 import edu.bbte.idde.paim1949.backend.annotation.IgnoreColumn;
+import edu.bbte.idde.paim1949.backend.annotation.RefToOne;
 import edu.bbte.idde.paim1949.backend.dao.Dao;
 import edu.bbte.idde.paim1949.backend.model.BaseEntity;
 import edu.bbte.idde.paim1949.backend.model.Tour;
@@ -18,9 +19,9 @@ import java.util.stream.IntStream;
 
 @Slf4j
 public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
-    private final ConnectionPool connectionPool;
-    private final Class<T> modelClass;
-    private final List<Field> fields;
+    protected final ConnectionPool connectionPool;
+    protected final Class<T> modelClass;
+    protected final List<Field> fields;
     private static final Map<Class<?>, String> TYPE_TO_SQL_TYPE;
 
     static {
@@ -56,8 +57,15 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             for (Field field: fields) {
                 creator.append(field.getName())
                         .append(' ')
-                        .append(TYPE_TO_SQL_TYPE.get(field.getType()))
-                        .append(',');
+                        .append(TYPE_TO_SQL_TYPE.get(field.getType()));
+                if (field.getAnnotation(RefToOne.class) != null) {
+                    creator.append("FOREIGN KEY REFERENCES ")
+                            .append(field.getAnnotation(RefToOne.class).refTableName())
+                            .append('(')
+                            .append(field.getAnnotation(RefToOne.class).refColumnName())
+                            .append(')');
+                }
+                creator.append(',');
             }
             creator.append("id BIGINT PRIMARY KEY AUTO_INCREMENT)");
 
