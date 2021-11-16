@@ -30,6 +30,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         TYPE_TO_SQL_TYPE.put(Float.class, "FLOAT");
         TYPE_TO_SQL_TYPE.put(Double.class, "DOUBLE");
         TYPE_TO_SQL_TYPE.put(Long.class, "BIGINT");
+        TYPE_TO_SQL_TYPE.put(Boolean.class, "BOOLEAN");
         TYPE_TO_SQL_TYPE.put(String.class, "VARCHAR(255)");
         TYPE_TO_SQL_TYPE.put(Date.class, "DATETIME");
         TYPE_TO_SQL_TYPE.put(Tour.SignShape.class,
@@ -57,15 +58,17 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             for (Field field: fields) {
                 creator.append(field.getName())
                         .append(' ')
-                        .append(TYPE_TO_SQL_TYPE.get(field.getType()));
+                        .append(TYPE_TO_SQL_TYPE.get(field.getType()))
+                        .append(',');
                 if (field.getAnnotation(RefToOne.class) != null) {
-                    creator.append("FOREIGN KEY REFERENCES ")
+                    creator.append(" FOREIGN KEY (")
+                            .append(field.getName())
+                            .append(") REFERENCES ")
                             .append(field.getAnnotation(RefToOne.class).refTableName())
                             .append('(')
                             .append(field.getAnnotation(RefToOne.class).refColumnName())
-                            .append(')');
+                            .append("),");
                 }
-                creator.append(',');
             }
             creator.append("id BIGINT PRIMARY KEY AUTO_INCREMENT)");
 
@@ -76,7 +79,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         } catch (JdbcException e) {
             log.error("Could not connect to database");
         } catch (SQLException e) {
-            log.error("Could not create table {}", modelClass.getSimpleName());
+            log.error("Could not create table {}: {}", modelClass.getSimpleName(), e.toString());
         } finally {
             connectionPool.returnConnection(connection);
         }
@@ -262,7 +265,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     public T delete(Long id) {
         StringBuilder delete = new StringBuilder("DELETE FROM ");
         delete.append(modelClass.getSimpleName());
-        delete.append(" WHERE id=").append(id);
+        delete.append(" WHERE id=?");
         log.info("Built delete statement '{}'", delete);
 
         Connection connection = null;
@@ -275,7 +278,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         } catch (JdbcException e) {
             log.error("Could not connect to database");
         } catch (SQLException e) {
-            log.error("SQL execution failed.");
+            log.error("SQL execution failed: {}", e.toString());
         } finally {
             connectionPool.returnConnection(connection);
         }

@@ -6,31 +6,22 @@ import edu.bbte.idde.paim1949.backend.dao.RegionDao;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
 
 public class JdbcDaoFactory implements DaoFactory {
-    private TourDao tourDao;
-    private RegionDao regionDao;
-    private RefugeDao refugeDao;
+    private final RegionDao regionDao = new RegionJdbcDao();
+    private final TourDao tourDao = new TourJdbcDao();
+    private final RefugeDao refugeDao = new RefugeJdbcDao();
 
     @Override
     public TourDao getTourDao() {
-        if (tourDao == null) {
-            tourDao = new TourJdbcDao();
-        }
         return tourDao;
     }
 
     @Override
     public RegionDao getRegionDao() {
-        if (regionDao == null) {
-            regionDao = new RegionJdbcDao();
-        }
         return regionDao;
     }
 
     @Override
     public RefugeDao getRefugeDao() {
-        if (refugeDao == null) {
-            refugeDao = new RefugeJdbcDao();
-        }
         return refugeDao;
     }
 }

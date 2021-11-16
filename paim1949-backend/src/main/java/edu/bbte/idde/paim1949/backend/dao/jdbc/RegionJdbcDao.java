@@ -21,6 +21,10 @@ public class RegionJdbcDao extends AbstractJdbcDao<Region> implements RegionDao 
                     .getRefugeDao().findByRegionId(region.getId())
                     .stream().map(BaseEntity::getId)
                     .collect(Collectors.toList()));
+            region.setTourIds(AbstractDaoFactory.getDaoFactory()
+                    .getTourDao().findByRegionId(region.getId())
+                    .stream().map(BaseEntity::getId)
+                    .collect(Collectors.toList()));
         }
         return regions;
     }
@@ -30,6 +34,10 @@ public class RegionJdbcDao extends AbstractJdbcDao<Region> implements RegionDao 
         Region region = super.findById(id);
         region.setRefugeIds(AbstractDaoFactory.getDaoFactory()
                 .getRefugeDao().findByRegionId(region.getId())
+                .stream().map(BaseEntity::getId)
+                .collect(Collectors.toList()));
+        region.setTourIds(AbstractDaoFactory.getDaoFactory()
+                .getTourDao().findByRegionId(region.getId())
                 .stream().map(BaseEntity::getId)
                 .collect(Collectors.toList()));
         return region;
