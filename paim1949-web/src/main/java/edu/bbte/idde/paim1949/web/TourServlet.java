@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.bbte.idde.paim1949.backend.dao.AbstractDaoFactory;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
 import edu.bbte.idde.paim1949.backend.model.Tour;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

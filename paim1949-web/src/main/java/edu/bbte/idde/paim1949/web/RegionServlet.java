@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.bbte.idde.paim1949.backend.dao.AbstractDaoFactory;
 import edu.bbte.idde.paim1949.backend.dao.RegionDao;
-import edu.bbte.idde.paim1949.backend.model.Refuge;
 import edu.bbte.idde.paim1949.backend.model.Region;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

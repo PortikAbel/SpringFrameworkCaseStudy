@@ -42,9 +42,9 @@ public class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao 
                 Refuge selectedModel = modelClass.getDeclaredConstructor().newInstance();
                 selectedModel.setId(resultSet.getLong("id"));
                 for (Field field: fields) {
-                    Object attribute = field.getType().isEnum() ?
-                            resultSet.getString(field.getName()) :
-                            resultSet.getObject(field.getName(), field.getType());
+                    Object attribute = field.getType().isEnum()
+                            ? resultSet.getString(field.getName())
+                            : resultSet.getObject(field.getName(), field.getType());
                     String setterName = "set"
                             + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                             + field.getName().substring(1);

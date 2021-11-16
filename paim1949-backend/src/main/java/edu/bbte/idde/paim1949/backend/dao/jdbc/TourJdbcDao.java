@@ -1,7 +1,6 @@
 package edu.bbte.idde.paim1949.backend.dao.jdbc;
 
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
-import edu.bbte.idde.paim1949.backend.model.Refuge;
 import edu.bbte.idde.paim1949.backend.model.Tour;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,9 +42,9 @@ public class TourJdbcDao extends AbstractJdbcDao<Tour> implements TourDao {
                 Tour selectedModel = modelClass.getDeclaredConstructor().newInstance();
                 selectedModel.setId(resultSet.getLong("id"));
                 for (Field field: fields) {
-                    Object attribute = field.getType().isEnum() ?
-                            resultSet.getString(field.getName()) :
-                            resultSet.getObject(field.getName(), field.getType());
+                    Object attribute = field.getType().isEnum()
+                            ? resultSet.getString(field.getName())
+                            : resultSet.getObject(field.getName(), field.getType());
                     String setterName = "set"
                             + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                             + field.getName().substring(1);

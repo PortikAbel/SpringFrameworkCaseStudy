@@ -105,9 +105,9 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
                 T selectedModel = modelClass.getDeclaredConstructor().newInstance();
                 selectedModel.setId(resultSet.getLong("id"));
                 for (Field field: fields) {
-                    Object attribute = field.getType().isEnum() ?
-                            resultSet.getString(field.getName()) :
-                            resultSet.getObject(field.getName(), field.getType());
+                    Object attribute = field.getType().isEnum()
+                            ? resultSet.getString(field.getName())
+                            : resultSet.getObject(field.getName(), field.getType());
                     String setterName = "set"
                             + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                             + field.getName().substring(1);
@@ -155,11 +155,9 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             selectedModel = modelClass.getDeclaredConstructor().newInstance();
             selectedModel.setId(resultSet.getLong("id"));
             for (Field field: fields) {
-                log.debug("field name {} with type {} enum?{}", field.getName(), field.getType(), field.getType().isEnum());
-                Object attribute = field.getType().isEnum() ?
-                        resultSet.getString(field.getName()) :
-                        resultSet.getObject(field.getName(), field.getType());
-                log.debug("got: {}", attribute.toString());
+                Object attribute = field.getType().isEnum()
+                        ? resultSet.getString(field.getName())
+                        : resultSet.getObject(field.getName(), field.getType());
                 String setterName = "set"
                         + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + field.getName().substring(1);
