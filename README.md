@@ -1,5 +1,7 @@
 # IDDE laborfeladatok
 
+Adatbázis használatakor a táblák létrejönnek. Egy ``tour`` nevű adatbázis szükséges hozzá.
+
 # paim1949-desktop futtatása:
 + Navigáljunk a projekt könyvtárába.
 + Futtatni a ``gradle run`` paranccsal tudunk
