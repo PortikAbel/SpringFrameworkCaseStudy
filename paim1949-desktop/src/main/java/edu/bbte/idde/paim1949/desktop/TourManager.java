@@ -11,31 +11,29 @@ import edu.bbte.idde.paim1949.backend.model.Tour;
 import java.util.Collection;
 
 public class TourManager {
-    private final static RegionDao regionServer = AbstractDaoFactory.getDaoFactory().getRegionDao();
-    private final static TourDao tourServer = AbstractDaoFactory.getDaoFactory().getTourDao();
-    private final static RefugeDao refugeServer = AbstractDaoFactory.getDaoFactory().getRefugeDao();
+    private static final RegionDao REGION_SERVER = AbstractDaoFactory.getDaoFactory().getRegionDao();
+    private static final TourDao TOUR_SERVER = AbstractDaoFactory.getDaoFactory().getTourDao();
+    private static final RefugeDao REFUGE_SERVER = AbstractDaoFactory.getDaoFactory().getRefugeDao();
 
-    private static void populateRegions()
-    {
+    private static void populateRegions() {
         Region region1 = new Region();
         region1.setName("Radnai");
-        regionServer.create(region1);
+        REGION_SERVER.create(region1);
 
         Region region2 = new Region();
         region2.setName("Hargita");
-        regionServer.create(region2);
+        REGION_SERVER.create(region2);
     }
 
-    private static void populateTours()
-    {
+    private static void populateTours() {
         Tour tour1 = new Tour();
         tour1.setDistanceInKm(12.3f);
         tour1.setElevationInM(787);
         tour1.setSignShape(Tour.SignShape.CIRCLE.name());
         tour1.setSignColour(Tour.SignColour.RED.name());
         tour1.setDaysRecommended(1);
-        tour1.setRegionId(4L);
-        tourServer.create(tour1);
+        tour1.setRegionId(0L);
+        TOUR_SERVER.create(tour1);
 
         Tour tour2 = new Tour();
         tour2.setDistanceInKm(26.4f);
@@ -43,8 +41,8 @@ public class TourManager {
         tour2.setSignShape(Tour.SignShape.TRIANGLE.name());
         tour2.setSignColour(Tour.SignColour.YELLOW.name());
         tour2.setDaysRecommended(2);
-        tour2.setRegionId(4L);
-        tourServer.create(tour2);
+        tour2.setRegionId(0L);
+        TOUR_SERVER.create(tour2);
 
         Tour tour3 = new Tour();
         tour3.setDistanceInKm(23.1f);
@@ -52,46 +50,52 @@ public class TourManager {
         tour3.setSignShape(Tour.SignShape.LINE.name());
         tour3.setSignColour(Tour.SignColour.RED.name());
         tour3.setDaysRecommended(2);
-        tour3.setRegionId(3L);
-        tourServer.create(tour3);
+        tour3.setRegionId(1L);
+        TOUR_SERVER.create(tour3);
     }
 
-    private static void populateRefuges()
-    {
+    private static void populateRefuges() {
         Refuge refuge = new Refuge();
         refuge.setNrOfRooms(1);
         refuge.setNrOfBeds(8);
         refuge.setIsOpenAtWinter(true);
-        refuge.setRegionId(4L);
-        refugeServer.create(refuge);
+        refuge.setRegionId(1L);
+        REFUGE_SERVER.create(refuge);
     }
 
     public static void main(String[] args) {
-        if (regionServer.findAll().isEmpty()) {
+        if (REGION_SERVER.findAll().isEmpty()) {
             populateRegions();
         }
-        if (tourServer.findAll().isEmpty()) {
+        if (TOUR_SERVER.findAll().isEmpty()) {
             populateTours();
         }
-        if (refugeServer.findAll().isEmpty()) {
+        if (REFUGE_SERVER.findAll().isEmpty()) {
             populateRefuges();
         }
 
-        Collection<Region> regions = regionServer.findAll();
+        Collection<Region> regions = REGION_SERVER.findAll();
         for (Region region: regions) {
-            regionServer.findById(region.getId());
+            REGION_SERVER.findById(region.getId());
         }
 
-        tourServer.findAll();
+        Long firstTourId = TOUR_SERVER.findAll().iterator().next().getId();
 
-        tourServer.findById(1L);
+        if (TOUR_SERVER.findAll().size() > 1) {
+            TOUR_SERVER.findById(firstTourId + 1);
+            TOUR_SERVER.delete(firstTourId + 1);
+            TOUR_SERVER.findAll();
+        }
 
-        tourServer.delete(1L);
-        tourServer.findAll();
-
-        Tour tour = tourServer.findById(0L);
-        tour.setElevationInM(tour.getElevationInM() + 1);
-        tourServer.update(0L, tour);
-        tourServer.findById(0L);
+        Tour oldTour = TOUR_SERVER.findById(firstTourId);
+        Tour newTour = new Tour();
+        newTour.setDistanceInKm(oldTour.getDistanceInKm());
+        newTour.setElevationInM(oldTour.getElevationInM() + 1);
+        newTour.setSignShape(oldTour.getSignShape());
+        newTour.setSignColour(oldTour.getSignColour());
+        newTour.setDaysRecommended(oldTour.getDaysRecommended());
+        newTour.setRegionId(oldTour.getRegionId());
+        TOUR_SERVER.update(firstTourId, newTour);
+        TOUR_SERVER.findById(firstTourId);
     }
 }

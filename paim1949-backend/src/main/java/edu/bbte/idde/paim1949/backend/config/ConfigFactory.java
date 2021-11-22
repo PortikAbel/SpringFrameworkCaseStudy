@@ -32,9 +32,10 @@ public class ConfigFactory {
         configFileNameBuilder.append(CONFIG_FILE_NAME);
         String profile = System.getProperty("profile");
         log.info("Determined profile: {}", profile);
-        if (profile != null && !profile.isEmpty()) {
-            configFileNameBuilder.append('-').append(profile);
-        }
+        configFileNameBuilder.append('-').append(
+                profile == null || profile.isEmpty()
+                        ? "dev"
+                        : profile);
         configFileNameBuilder.append(".yml");
         return configFileNameBuilder.toString();
     }
