@@ -21,22 +21,6 @@ public class Tour extends BaseEntity {
     @RefToOne(refTableName = "Region")
     private Long regionId;
 
-    public Tour() {
-        super();
-    }
-
-    public Tour(Float distanceInKm, Integer elevationInM,
-                SignShape signShape, SignColour signColour,
-                Integer daysRecommended) {
-        super();
-
-        this.distanceInKm = distanceInKm;
-        this.elevationInM = elevationInM;
-        this.signShape = signShape;
-        this.signColour = signColour;
-        this.daysRecommended = daysRecommended;
-    }
-
     public String getSignShape() {
         return signShape.name();
     }
