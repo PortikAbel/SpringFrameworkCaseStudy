@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- appender with name STDOUT -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- print format (using date, thread, level, logger name and message -->
+            <Pattern>
+                %d{dd-MM-yyyy HH:mm:ss} %-5level %logger{36} - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>../log/desktop.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- print format (using date, thread, level, logger name and message -->
+            <Pattern>
+                %d{HH:mm:ss} %-5level %logger{36} - %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+    <!-- named logger used by every class in our project -->
+    <logger name="edu.bbte.idde.paim1949" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+    <!-- root logger (used by all else) -->
+    <root level="error">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
