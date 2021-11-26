@@ -7,6 +7,9 @@ dependencies {
 }
 
 application {
+    if (project.properties.profile) {
+        applicationDefaultJvmArgs = ["-Dprofile=${project.properties.profile}"]
+    }
     mainClass = 'edu.bbte.idde.paim1949.desktop.TourManager'
 }
 

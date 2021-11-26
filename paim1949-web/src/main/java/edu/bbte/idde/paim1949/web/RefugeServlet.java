@@ -3,33 +3,32 @@ package edu.bbte.idde.paim1949.web;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.bbte.idde.paim1949.backend.dao.AbstractDaoFactory;
-import edu.bbte.idde.paim1949.backend.dao.TourDao;
-import edu.bbte.idde.paim1949.backend.model.Tour;
+import edu.bbte.idde.paim1949.backend.dao.RefugeDao;
+import edu.bbte.idde.paim1949.backend.model.Refuge;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
-@WebServlet("/tours")
-public class TourServlet extends HttpServlet {
-    private static final Logger LOG = LoggerFactory.getLogger(TourServlet.class);
-    private TourDao tourDao;
+@Slf4j
+@WebServlet("/refuges")
+public class RefugeServlet extends HttpServlet {
+    private RefugeDao refugeDao;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() {
-        tourDao = AbstractDaoFactory.getDaoFactory().getTourDao();
+        refugeDao = AbstractDaoFactory.getDaoFactory().getRefugeDao();
         objectMapper = ObjectMapperFactory.getObjectMapper();
-        LOG.info("Server initialized");
+        log.info("Server initialized");
     }
 
     @Override
     public void destroy() {
-        LOG.info("Destroying server");
+        log.info("Destroying server");
         super.destroy();
     }
 
@@ -38,18 +37,18 @@ public class TourServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         if (idParam == null) {
             resp.setHeader("Content-Type", "application/json");
-            objectMapper.writeValue(resp.getOutputStream(), tourDao.findAll());
+            objectMapper.writeValue(resp.getOutputStream(), refugeDao.findAll());
         } else {
             try {
                 Long id = Long.parseLong(idParam);
-                Tour tour = tourDao.findById(id);
+                Refuge refuge = refugeDao.findById(id);
 
-                if (tour == null) {
+                if (refuge == null) {
                     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    resp.getWriter().println("Tour with id " + id + " not found");
+                    resp.getWriter().println("Refuge with id " + id + " not found");
                 } else {
                     resp.setHeader("Content-Type", "application/json");
-                    objectMapper.writeValue(resp.getOutputStream(), tour);
+                    objectMapper.writeValue(resp.getOutputStream(), refuge);
                 }
             } catch (NumberFormatException e) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -61,13 +60,13 @@ public class TourServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            Tour tour = objectMapper.readValue(req.getInputStream(), Tour.class);
-            Tour createdTour = tourDao.create(tour);
+            Refuge refuge = objectMapper.readValue(req.getInputStream(), Refuge.class);
+            Refuge createdRefuge = refugeDao.create(refuge);
             resp.setHeader("Content-Type", "application/json");
-            objectMapper.writeValue(resp.getOutputStream(), createdTour);
+            objectMapper.writeValue(resp.getOutputStream(), createdRefuge);
         } catch (DatabindException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("Invalid tour:" + e.getMessage());
+            resp.getWriter().println("Invalid refuge:" + e.getMessage());
         }
     }
 
@@ -76,14 +75,14 @@ public class TourServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         try {
             Long id = Long.parseLong(idParam);
-            Tour tour = tourDao.findById(id);
+            Refuge refuge = refugeDao.findById(id);
 
-            if (tour == null) {
+            if (refuge == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().println("Tour with id " + id + " not found");
+                resp.getWriter().println("Refuge with id " + id + " not found");
             } else {
-                tour = tourDao.delete(id);
-                objectMapper.writeValue(resp.getOutputStream(), tour);
+                refuge = refugeDao.delete(id);
+                objectMapper.writeValue(resp.getOutputStream(), refuge);
             }
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -96,20 +95,20 @@ public class TourServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         try {
             Long id = Long.parseLong(idParam);
-            Tour tour = tourDao.findById(id);
+            Refuge refuge = refugeDao.findById(id);
 
-            if (tour == null) {
+            if (refuge == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().println("Tour with id " + id + " not found");
+                resp.getWriter().println("Refuge with id " + id + " not found");
             } else {
                 try {
-                    tour = objectMapper.readValue(req.getInputStream(), Tour.class);
-                    Tour oldTour = tourDao.update(id, tour);
+                    refuge = objectMapper.readValue(req.getInputStream(), Refuge.class);
+                    Refuge oldRefuge = refugeDao.update(id, refuge);
                     resp.setHeader("Content-Type", "application/json");
-                    objectMapper.writeValue(resp.getOutputStream(), oldTour);
+                    objectMapper.writeValue(resp.getOutputStream(), oldRefuge);
                 } catch (DatabindException e) {
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println("Invalid tour:" + e.getMessage());
+                    resp.getWriter().println("Invalid refuge:" + e.getMessage());
                 }
             }
         } catch (NumberFormatException e) {

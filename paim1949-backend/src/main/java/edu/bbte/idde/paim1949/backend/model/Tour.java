@@ -1,5 +1,13 @@
 package edu.bbte.idde.paim1949.backend.model;
 
+import edu.bbte.idde.paim1949.backend.annotation.RefToOne;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class Tour extends BaseEntity {
     public enum SignShape { CIRCLE, TRIANGLE, LINE, CROSS }
 
@@ -10,71 +18,22 @@ public class Tour extends BaseEntity {
     private SignShape signShape;
     private SignColour signColour;
     private Integer daysRecommended;
+    @RefToOne(refTableName = "Region")
+    private Long regionId;
 
-    public Tour() {
-        super();
+    public String getSignShape() {
+        return signShape.name();
     }
 
-    public Tour(Float distanceInKm, Integer elevationInM,
-                SignShape signShape, SignColour signColour,
-                Integer daysRecommended) {
-        super();
-
-        this.distanceInKm = distanceInKm;
-        this.elevationInM = elevationInM;
-        this.signShape = signShape;
-        this.signColour = signColour;
-        this.daysRecommended = daysRecommended;
+    public void setSignShape(String signShape) {
+        this.signShape = SignShape.valueOf(signShape);
     }
 
-    public Float getDistanceInKm() {
-        return distanceInKm;
+    public String getSignColour() {
+        return signColour.name();
     }
 
-    public void setDistanceInKm(Float distanceInKm) {
-        this.distanceInKm = distanceInKm;
-    }
-
-    public Integer getElevationInM() {
-        return elevationInM;
-    }
-
-    public void setElevationInM(Integer elevationInM) {
-        this.elevationInM = elevationInM;
-    }
-
-    public SignShape getSignShape() {
-        return signShape;
-    }
-
-    public void setSignShape(SignShape signShape) {
-        this.signShape = signShape;
-    }
-
-    public SignColour getSignColour() {
-        return signColour;
-    }
-
-    public void setSignColour(SignColour signColour) {
-        this.signColour = signColour;
-    }
-
-    public Integer getDaysRecommended() {
-        return daysRecommended;
-    }
-
-    public void setDaysRecommended(Integer daysRecommended) {
-        this.daysRecommended = daysRecommended;
-    }
-
-    @Override
-    public String toString() {
-        return "Tour{"
-                + "distanceInKm=" + distanceInKm
-                + ", elevationInM=" + elevationInM
-                + ", signShape=" + signShape
-                + ", signColour=" + signColour
-                + ", daysRecommended=" + daysRecommended
-                + '}';
+    public void setSignColour(String signColour) {
+        this.signColour = SignColour.valueOf(signColour);
     }
 }
