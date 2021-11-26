@@ -3,33 +3,32 @@ package edu.bbte.idde.paim1949.web;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.bbte.idde.paim1949.backend.dao.AbstractDaoFactory;
-import edu.bbte.idde.paim1949.backend.dao.TourDao;
-import edu.bbte.idde.paim1949.backend.model.Tour;
+import edu.bbte.idde.paim1949.backend.dao.RegionDao;
+import edu.bbte.idde.paim1949.backend.model.Region;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
-@WebServlet("/tours")
-public class TourServlet extends HttpServlet {
-    private static final Logger LOG = LoggerFactory.getLogger(TourServlet.class);
-    private TourDao tourDao;
+@Slf4j
+@WebServlet("/regions")
+public class RegionServlet extends HttpServlet {
+    private RegionDao regionDao;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() {
-        tourDao = AbstractDaoFactory.getDaoFactory().getTourDao();
+        regionDao = AbstractDaoFactory.getDaoFactory().getRegionDao();
         objectMapper = ObjectMapperFactory.getObjectMapper();
-        LOG.info("Server initialized");
+        log.info("Server initialized");
     }
 
     @Override
     public void destroy() {
-        LOG.info("Destroying server");
+        log.info("Destroying server");
         super.destroy();
     }
 
@@ -38,18 +37,18 @@ public class TourServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         if (idParam == null) {
             resp.setHeader("Content-Type", "application/json");
-            objectMapper.writeValue(resp.getOutputStream(), tourDao.findAll());
+            objectMapper.writeValue(resp.getOutputStream(), regionDao.findAll());
         } else {
             try {
                 Long id = Long.parseLong(idParam);
-                Tour tour = tourDao.findById(id);
+                Region region = regionDao.findById(id);
 
-                if (tour == null) {
+                if (region == null) {
                     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    resp.getWriter().println("Tour with id " + id + " not found");
+                    resp.getWriter().println("Region with id " + id + " not found");
                 } else {
                     resp.setHeader("Content-Type", "application/json");
-                    objectMapper.writeValue(resp.getOutputStream(), tour);
+                    objectMapper.writeValue(resp.getOutputStream(), region);
                 }
             } catch (NumberFormatException e) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -61,13 +60,13 @@ public class TourServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            Tour tour = objectMapper.readValue(req.getInputStream(), Tour.class);
-            Tour createdTour = tourDao.create(tour);
+            Region region = objectMapper.readValue(req.getInputStream(), Region.class);
+            Region createdRegion = regionDao.create(region);
             resp.setHeader("Content-Type", "application/json");
-            objectMapper.writeValue(resp.getOutputStream(), createdTour);
+            objectMapper.writeValue(resp.getOutputStream(), createdRegion);
         } catch (DatabindException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("Invalid tour:" + e.getMessage());
+            resp.getWriter().println("Invalid region:" + e.getMessage());
         }
     }
 
@@ -76,14 +75,14 @@ public class TourServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         try {
             Long id = Long.parseLong(idParam);
-            Tour tour = tourDao.findById(id);
+            Region region = regionDao.findById(id);
 
-            if (tour == null) {
+            if (region == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().println("Tour with id " + id + " not found");
+                resp.getWriter().println("Region with id " + id + " not found");
             } else {
-                tour = tourDao.delete(id);
-                objectMapper.writeValue(resp.getOutputStream(), tour);
+                region = regionDao.delete(id);
+                objectMapper.writeValue(resp.getOutputStream(), region);
             }
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -96,20 +95,20 @@ public class TourServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         try {
             Long id = Long.parseLong(idParam);
-            Tour tour = tourDao.findById(id);
+            Region region = regionDao.findById(id);
 
-            if (tour == null) {
+            if (region == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().println("Tour with id " + id + " not found");
+                resp.getWriter().println("Region with id " + id + " not found");
             } else {
                 try {
-                    tour = objectMapper.readValue(req.getInputStream(), Tour.class);
-                    Tour oldTour = tourDao.update(id, tour);
+                    region = objectMapper.readValue(req.getInputStream(), Region.class);
+                    Region oldRegion = regionDao.update(id, region);
                     resp.setHeader("Content-Type", "application/json");
-                    objectMapper.writeValue(resp.getOutputStream(), oldTour);
+                    objectMapper.writeValue(resp.getOutputStream(), oldRegion);
                 } catch (DatabindException e) {
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println("Invalid tour:" + e.getMessage());
+                    resp.getWriter().println("Invalid region:" + e.getMessage());
                 }
             }
         } catch (NumberFormatException e) {

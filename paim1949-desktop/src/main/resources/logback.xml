@@ -10,7 +10,7 @@
         </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>../log/backend.log</file>
+        <file>../log/desktop.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- print format (using date, thread, level, logger name and message -->
             <Pattern>
