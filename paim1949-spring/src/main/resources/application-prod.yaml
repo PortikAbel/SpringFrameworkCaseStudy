@@ -1,0 +1,6 @@
+jdbc:
+  url: jdbc:mysql://localhost:3306/tour?verifyServerCertificate=false&useSSL=true
+  driverClass: com.mysql.jdbc.Driver
+  poolSize: 4
+  userName: root
+  password: root
