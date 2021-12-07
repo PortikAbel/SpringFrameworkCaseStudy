@@ -3,14 +3,9 @@ package edu.bbte.idde.paim1949.backend.dao.jdbc;
 import edu.bbte.idde.paim1949.backend.dao.DaoFactory;
 import edu.bbte.idde.paim1949.backend.dao.RegionDao;
 import edu.bbte.idde.paim1949.backend.model.BaseEntity;
-import edu.bbte.idde.paim1949.backend.model.Refuge;
 import edu.bbte.idde.paim1949.backend.model.Region;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -20,11 +15,6 @@ public class RegionJdbcDao extends AbstractJdbcDao<Region> implements RegionDao 
 
     public RegionJdbcDao() {
         super(Region.class);
-    }
-
-    @PostConstruct
-    protected void init() {
-        super.init();
     }
 
     @Override
