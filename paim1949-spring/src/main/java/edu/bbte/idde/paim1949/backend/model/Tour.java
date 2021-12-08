@@ -28,10 +28,7 @@ public class Tour extends BaseEntity {
     }
 
     public void setSignShape(String signShape) {
-        if (signShape == null) {
-            this.signShape = null;
-        }
-        else {
+        if (signShape != null) {
             this.signShape = SignShape.valueOf(signShape);
         }
     }
@@ -41,10 +38,7 @@ public class Tour extends BaseEntity {
     }
 
     public void setSignColour(String signColour) {
-        if (signColour == null) {
-            this.signColour = null;
-        }
-        else {
+        if (signColour != null) {
             this.signColour = SignColour.valueOf(signColour);
         }
     }
