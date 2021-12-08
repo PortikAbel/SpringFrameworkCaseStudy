@@ -199,6 +199,13 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             }
             log.info("Executing statement");
             insertStatement.executeUpdate();
+
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT LAST_INSERT_ID()");
+            if (!resultSet.next()) {
+                return null;
+            }
+            value.setId(resultSet.getLong(1));
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -209,10 +216,24 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
 
     @Override
     public T update(Long id, T value) {
+        List<Field> fieldsToUpdate = fields.stream()
+                .filter(field -> {
+                    try {
+                        Method getter = modelClass.getDeclaredMethod("get"
+                                + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                                + field.getName().substring(1));
+                        Object getterResult = getter.invoke(value);
+                        return getterResult != null;
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                        log.error("Could not instantiate from model class");
+                    }
+                    return false;
+                }).collect(Collectors.toList());
+
         StringBuilder updater = new StringBuilder("UPDATE ")
                 .append(modelClass.getSimpleName())
                 .append(" SET ");
-        updater.append(fields.stream()
+        updater.append(fieldsToUpdate.stream()
                 .map(field -> field.getName() + "=?")
                 .collect(Collectors.joining(",")));
         updater.append(" WHERE id=?");
@@ -221,7 +242,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement updateStatement = connection.prepareStatement(updater.toString());
             int i = 1;
-            for (Field field : fields) {
+            for (Field field : fieldsToUpdate) {
                 Method getter = modelClass.getDeclaredMethod("get"
                         + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + field.getName().substring(1));
@@ -240,7 +261,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     }
 
     @Override
-    public T delete(Long id) {
+    public boolean delete(Long id) {
         StringBuilder delete = new StringBuilder("DELETE FROM ");
         delete.append(modelClass.getSimpleName());
         delete.append(" WHERE id=?");
@@ -253,7 +274,8 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             deleteStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
+            return false;
         }
-        return null;
+        return true;
     }
 }

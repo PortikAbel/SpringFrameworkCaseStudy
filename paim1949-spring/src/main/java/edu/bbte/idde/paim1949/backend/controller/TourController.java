@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collection;
 
@@ -42,7 +43,7 @@ public class TourController {
     }
 
     @PostMapping
-    public ResponseEntity<TourDetailsDto> createTour(@RequestBody TourCreationDto tourCreationDto) {
+    public ResponseEntity<TourDetailsDto> createTour(@RequestBody @Valid TourCreationDto tourCreationDto) {
         Tour tour = tourDao.create(tourMapper.creationDtoToModel(tourCreationDto));
         URI createUri = URI.create("/api/tours/" + tour.getId());
         return ResponseEntity.created(createUri).body(tourMapper.modelToDetailsDto(tour));
@@ -50,40 +51,21 @@ public class TourController {
 
     @PatchMapping("/{tourId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateTour(@PathVariable("tourId") Long tourId, @RequestBody TourUpdateDto tourUpdateDto) {
+    public void updateTour(@PathVariable("tourId") Long tourId, @RequestBody @Valid TourUpdateDto tourUpdateDto) {
         Tour tour = tourDao.findById(tourId);
-
         if (tour == null) {
             throw new NotFoundException("Tour with id " + tourId + " not found");
         }
 
-        Tour newTour = tourMapper.updateDtoToModel(tourUpdateDto);
-        if (newTour.getRegionId() != null) {
-            tour.setRegionId(newTour.getRegionId());
-        }
-        if (newTour.getDaysRecommended() != null) {
-            tour.setDaysRecommended(newTour.getDaysRecommended());
-        }
-        if (newTour.getSignColour() != null) {
-            tour.setSignColour(newTour.getSignColour());
-        }
-        if (newTour.getSignShape() != null) {
-            tour.setSignShape(newTour.getSignShape());
-        }
-        if (newTour.getDistanceInKm() != null) {
-            tour.setDistanceInKm(newTour.getDistanceInKm());
-        }
-        if (newTour.getElevationInM() != null) {
-            tour.setElevationInM(newTour.getElevationInM());
-        }
+        Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto);
 
-        tourDao.update(tourId, newTour);
+        tourDao.update(tourId, tourUpdateModel);
     }
 
     @DeleteMapping("/{tourId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTour(@PathVariable("tourId") Long tourId) {
-        if (tourDao.delete(tourId) == null) {
+        if (!tourDao.delete(tourId)) {
             throw new NotFoundException("Tour with id " + tourId + " not found");
         }
     }

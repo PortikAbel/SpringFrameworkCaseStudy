@@ -50,10 +50,15 @@ public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
     }
 
     @Override
-    public T delete(Long id) {
-        T value = dataBase.remove(id);
+    public boolean delete(Long id) {
+        if (!dataBase.containsKey(id)) {
+            log.debug("Model with id {} not found.", id);
+            return false;
+        }
 
-        log.info("Model removed: " + value);
-        return value;
+        dataBase.remove(id);
+        log.info("Model with id {} removed.", id);
+
+        return true;
     }
 }

@@ -12,6 +12,7 @@ import java.util.Collection;
 
 @Mapper(componentModel = "spring")
 public abstract class TourMapper {
+
     @IterableMapping(elementTargetType = TourReducedDto.class)
     public abstract Collection<TourReducedDto> modelsToReducedDtos(Iterable<Tour> model);
 
@@ -20,4 +21,5 @@ public abstract class TourMapper {
     public abstract Tour creationDtoToModel(TourCreationDto dto);
 
     public abstract Tour updateDtoToModel(TourUpdateDto dto);
+
 }
