@@ -52,14 +52,11 @@ public class TourController {
     @PatchMapping("/{tourId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTour(@PathVariable("tourId") Long tourId, @RequestBody @Valid TourUpdateDto tourUpdateDto) {
-        Tour tour = tourDao.findById(tourId);
-        if (tour == null) {
+        Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto);
+        Tour updatedTour = tourDao.update(tourId, tourUpdateModel);
+        if (updatedTour == null) {
             throw new NotFoundException("Tour with id " + tourId + " not found");
         }
-
-        Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto);
-
-        tourDao.update(tourId, tourUpdateModel);
     }
 
     @DeleteMapping("/{tourId}")

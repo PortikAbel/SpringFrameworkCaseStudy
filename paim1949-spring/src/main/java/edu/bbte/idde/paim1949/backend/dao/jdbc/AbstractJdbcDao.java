@@ -216,6 +216,11 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
 
     @Override
     public T update(Long id, T value) {
+        T oldValue = findById(id);
+        if (oldValue == null) {
+            return null;
+        }
+
         List<Field> fieldsToUpdate = fields.stream()
                 .filter(field -> {
                     try {
@@ -243,10 +248,13 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             PreparedStatement updateStatement = connection.prepareStatement(updater.toString());
             int i = 1;
             for (Field field : fieldsToUpdate) {
-                Method getter = modelClass.getDeclaredMethod("get"
-                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                        + field.getName().substring(1));
+                String suffixGetterSetter = field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                        + field.getName().substring(1);
+                Method getter = modelClass.getDeclaredMethod("get" + suffixGetterSetter);
                 Object getterResult = getter.invoke(value);
+                Method setter = modelClass.getDeclaredMethod("set" + suffixGetterSetter,
+                        field.getType().isEnum() ? String.class : field.getType());
+                setter.invoke(oldValue, getterResult);
                 updateStatement.setObject(i++, getterResult);
             }
             updateStatement.setLong(i, id);
@@ -257,7 +265,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             log.error("Could not instantiate from model class");
         }
-        return value;
+        return oldValue;
     }
 
     @Override
