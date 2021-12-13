@@ -1,11 +1,14 @@
 package edu.bbte.idde.paim1949.backend.dao.mem;
 
+import edu.bbte.idde.paim1949.backend.annotation.IgnoreColumn;
 import edu.bbte.idde.paim1949.backend.dao.Dao;
+import edu.bbte.idde.paim1949.backend.exception.ReflectionException;
 import edu.bbte.idde.paim1949.backend.model.BaseEntity;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collection;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,14 +42,52 @@ public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
 
     @Override
     public T update(Long id, T value) {
-        T oldT = dataBase.get(id);
+        T oldValue = dataBase.get(id);
+        if (oldValue == null) {
+            return create(value);
+        }
         dataBase.replace(id, value);
 
         log.info("Model being updated."
-                + "\n\told value: " + oldT
+                + "\n\told value: " + oldValue
                 + "\n\tnew value: " + value
         );
-        return oldT;
+        return value;
+    }
+
+    @Override
+    public T merge(Long id, T value) {
+        T oldValue = dataBase.get(id);
+        if (oldValue == null) {
+            return null;
+        }
+
+        Class<? extends BaseEntity> modelClass = value.getClass();
+        Arrays.stream(modelClass.getDeclaredFields())
+                .filter(field -> field.getAnnotation(IgnoreColumn.class) == null)
+                .forEach(field -> {
+                    try {
+                        String suffixGetterSetter = field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                                + field.getName().substring(1);
+                        Method getter = modelClass.getDeclaredMethod("get" + suffixGetterSetter);
+                        Object getterResult = getter.invoke(value);
+                        if (getterResult == null) {
+                            Method setter = modelClass.getDeclaredMethod("set" + suffixGetterSetter,
+                                    field.getType().isEnum() ? String.class : field.getType());
+                            setter.invoke(value, getter.invoke(oldValue));
+                        }
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                        log.error("Could not instantiate from model class");
+                        throw new ReflectionException();
+                    }
+                });
+        dataBase.replace(id, value);
+
+        log.info("Model being updated."
+                + "\n\told value: " + oldValue
+                + "\n\tnew value: " + value
+        );
+        return value;
     }
 
     @Override

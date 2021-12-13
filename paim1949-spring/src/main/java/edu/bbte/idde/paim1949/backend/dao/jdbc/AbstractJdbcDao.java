@@ -3,6 +3,8 @@ package edu.bbte.idde.paim1949.backend.dao.jdbc;
 import edu.bbte.idde.paim1949.backend.annotation.IgnoreColumn;
 import edu.bbte.idde.paim1949.backend.annotation.RefToOne;
 import edu.bbte.idde.paim1949.backend.dao.Dao;
+import edu.bbte.idde.paim1949.backend.exception.DatabaseException;
+import edu.bbte.idde.paim1949.backend.exception.ReflectionException;
 import edu.bbte.idde.paim1949.backend.model.BaseEntity;
 import edu.bbte.idde.paim1949.backend.model.Tour;
 import lombok.NonNull;
@@ -86,6 +88,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             createStatement.executeUpdate(creator.toString());
         } catch (SQLException e) {
             log.error("Could not create table {}: {}", modelClass.getSimpleName(), e.toString());
+            throw new DatabaseException();
         }
     }
 
@@ -121,11 +124,13 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             }
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
+            throw new DatabaseException();
         } catch (InvocationTargetException
                 | InstantiationException
                 | IllegalAccessException
                 | NoSuchMethodException e) {
             log.error("Could not instantiate from model class");
+            throw new ReflectionException();
         }
         return result;
     }
@@ -139,7 +144,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         selector.append(",id FROM ").append(modelClass.getSimpleName());
         selector.append(" WHERE id=").append(id);
         log.info("Built select statement: {}", selector);
-        T selectedModel = null;
+        T selectedModel;
 
         try (Connection connection = dataSource.getConnection()) {
             Statement statement = connection.createStatement();
@@ -163,11 +168,13 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             }
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
+            throw new DatabaseException();
         } catch (InvocationTargetException
                 | InstantiationException
                 | IllegalAccessException
                 | NoSuchMethodException e) {
             log.error("Could not instantiate from model class");
+            throw new ReflectionException();
         }
         return selectedModel;
     }
@@ -208,14 +215,58 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             value.setId(resultSet.getLong(1));
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
+            throw new DatabaseException();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             log.error("Could not instantiate from model class");
+            throw new ReflectionException();
         }
         return value;
     }
 
     @Override
     public T update(Long id, T value) {
+        T oldValue = findById(id);
+        if (oldValue == null) {
+            return create(value);
+        }
+
+        StringBuilder updater = new StringBuilder("UPDATE ")
+                .append(modelClass.getSimpleName())
+                .append(" SET ");
+        updater.append(fields.stream()
+                .map(field -> field.getName() + "=?")
+                .collect(Collectors.joining(",")));
+        updater.append(" WHERE id=?");
+        log.info("Built update statement '{}'", updater);
+
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement updateStatement = connection.prepareStatement(updater.toString());
+            int i = 1;
+            for (Field field : fields) {
+                String suffixGetterSetter = field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                        + field.getName().substring(1);
+                Method getter = modelClass.getDeclaredMethod("get" + suffixGetterSetter);
+                Object getterResult = getter.invoke(value);
+                Method setter = modelClass.getDeclaredMethod("set" + suffixGetterSetter,
+                        field.getType().isEnum() ? String.class : field.getType());
+                setter.invoke(oldValue, getterResult);
+                updateStatement.setObject(i++, getterResult);
+            }
+            updateStatement.setLong(i, id);
+            log.info("Executing statement");
+            updateStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("SQL execution failed.");
+            throw new DatabaseException();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            log.error("Could not instantiate from model class");
+            throw new ReflectionException();
+        }
+        return oldValue;
+    }
+
+    @Override
+    public T merge(Long id, T value) {
         T oldValue = findById(id);
         if (oldValue == null) {
             return null;
@@ -262,14 +313,20 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             updateStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("SQL execution failed.");
+            throw new DatabaseException();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             log.error("Could not instantiate from model class");
+            throw new ReflectionException();
         }
         return oldValue;
     }
 
     @Override
     public boolean delete(Long id) {
+        if (findById(id) == null) {
+            return false;
+        }
+
         StringBuilder delete = new StringBuilder("DELETE FROM ");
         delete.append(modelClass.getSimpleName());
         delete.append(" WHERE id=?");
@@ -282,7 +339,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             deleteStatement.executeUpdate();
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
-            return false;
+            throw new DatabaseException();
         }
         return true;
     }

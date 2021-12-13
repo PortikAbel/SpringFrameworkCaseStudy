@@ -49,14 +49,26 @@ public class TourController {
         return ResponseEntity.created(createUri).body(tourMapper.modelToDetailsDto(tour));
     }
 
-    @PatchMapping("/{tourId}")
+    @PutMapping("/{tourId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateTour(@PathVariable("tourId") Long tourId, @RequestBody @Valid TourUpdateDto tourUpdateDto) {
+    public void updateTour(
+            @PathVariable("tourId") Long tourId,
+            @RequestBody @Valid TourCreationDto tourUpdateDto) {
+        Tour tourUpdateModel = tourMapper.creationDtoToModel(tourUpdateDto);
+        tourDao.update(tourId, tourUpdateModel);
+    }
+
+    @PatchMapping("/{tourId}")
+    public ResponseEntity<TourDetailsDto> mergeTour(
+            @PathVariable("tourId") Long tourId,
+            @RequestBody @Valid TourUpdateDto tourUpdateDto) {
         Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto);
-        Tour updatedTour = tourDao.update(tourId, tourUpdateModel);
-        if (updatedTour == null) {
-            throw new NotFoundException("Tour with id " + tourId + " not found");
+        Tour mergedTour = tourDao.merge(tourId, tourUpdateModel);
+        if (mergedTour == null) {
+            throw new NotFoundException("Tour with id " + tourId + " does not exists");
         }
+        URI mergeUri = URI.create("/api/tours/" + mergedTour.getId());
+        return ResponseEntity.created(mergeUri).body(tourMapper.modelToDetailsDto(mergedTour));
     }
 
     @DeleteMapping("/{tourId}")

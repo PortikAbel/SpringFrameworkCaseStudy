@@ -13,5 +13,7 @@ public interface Dao<T extends BaseEntity> {
 
     T update(Long id, T value);
 
+    T merge(Long id, T value);
+
     boolean delete(Long id);
 }

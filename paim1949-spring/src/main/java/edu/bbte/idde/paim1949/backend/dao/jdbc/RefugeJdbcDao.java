@@ -1,6 +1,8 @@
 package edu.bbte.idde.paim1949.backend.dao.jdbc;
 
 import edu.bbte.idde.paim1949.backend.dao.RefugeDao;
+import edu.bbte.idde.paim1949.backend.exception.DatabaseException;
+import edu.bbte.idde.paim1949.backend.exception.ReflectionException;
 import edu.bbte.idde.paim1949.backend.model.Refuge;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -58,11 +60,13 @@ public class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao 
             }
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
+            throw new DatabaseException();
         } catch (InvocationTargetException
                 | InstantiationException
                 | IllegalAccessException
                 | NoSuchMethodException e) {
             log.error("Could not instantiate from model class");
+            throw new ReflectionException();
         }
         return result;
     }

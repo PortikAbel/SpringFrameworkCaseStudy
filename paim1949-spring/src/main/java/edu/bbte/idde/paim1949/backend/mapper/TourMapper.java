@@ -7,10 +7,11 @@ import edu.bbte.idde.paim1949.backend.dto.outgoing.TourReducedDto;
 import edu.bbte.idde.paim1949.backend.model.Tour;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.Collection;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class TourMapper {
 
     @IterableMapping(elementTargetType = TourReducedDto.class)
