@@ -3,6 +3,8 @@ package edu.bbte.idde.paim1949.backend.dao.jdbc;
 import edu.bbte.idde.paim1949.backend.dao.RefugeDao;
 import edu.bbte.idde.paim1949.backend.model.Refuge;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -17,6 +19,8 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Repository
+@Profile("prod")
 public class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao {
     public RefugeJdbcDao() {
         super(Refuge.class);
