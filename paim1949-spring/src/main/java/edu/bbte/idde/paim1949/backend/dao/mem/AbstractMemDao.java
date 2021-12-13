@@ -44,8 +44,11 @@ public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
     public T update(Long id, T value) {
         T oldValue = dataBase.get(id);
         if (oldValue == null) {
-            return create(value);
+            value.setId(id);
+            dataBase.put(id, value);
+            return value;
         }
+
         dataBase.replace(id, value);
 
         log.info("Model being updated."
@@ -77,10 +80,11 @@ public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
                             setter.invoke(value, getter.invoke(oldValue));
                         }
                     } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                        log.error("Could not instantiate from model class");
+                        log.error("Could not instantiate from model class. " + e + " " + e.getMessage());
                         throw new ReflectionException();
                     }
                 });
+        value.setId(id);
         dataBase.replace(id, value);
 
         log.info("Model being updated."

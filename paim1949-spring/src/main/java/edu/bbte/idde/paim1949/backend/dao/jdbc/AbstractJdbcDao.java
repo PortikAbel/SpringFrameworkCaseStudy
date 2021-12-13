@@ -181,53 +181,15 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
 
     @Override
     public T create(T value) {
-        StringBuilder inserter = new StringBuilder("INSERT INTO ")
-                .append(modelClass.getSimpleName())
-                .append('(');
-        inserter.append(fields.stream()
-                .map(Field::getName)
-                .collect(Collectors.joining(",")));
-        inserter.append(") VALUES (")
-                .append(IntStream.range(0, fields.size())
-                        .mapToObj(i -> "?")
-                        .collect(Collectors.joining(",")));
-        inserter.append(')');
-        log.info("Built insert statement '{}'", inserter);
-
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement insertStatement = connection.prepareStatement(inserter.toString());
-            int i = 1;
-            for (Field field : fields) {
-                Method getter = modelClass.getDeclaredMethod("get"
-                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                        + field.getName().substring(1));
-                Object getterResult = getter.invoke(value);
-                insertStatement.setObject(i++, getterResult);
-            }
-            log.info("Executing statement");
-            insertStatement.executeUpdate();
-
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT LAST_INSERT_ID()");
-            if (!resultSet.next()) {
-                return null;
-            }
-            value.setId(resultSet.getLong(1));
-        } catch (SQLException e) {
-            log.error("SQL execution failed: {}", e.toString());
-            throw new DatabaseException();
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            log.error("Could not instantiate from model class");
-            throw new ReflectionException();
-        }
-        return value;
+        return insert(value, false);
     }
 
     @Override
     public T update(Long id, T value) {
         T oldValue = findById(id);
         if (oldValue == null) {
-            return create(value);
+            value.setId(id);
+            return insert(value, true);
         }
 
         StringBuilder updater = new StringBuilder("UPDATE ")
@@ -342,5 +304,55 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             throw new DatabaseException();
         }
         return true;
+    }
+
+    private T insert(T value, boolean idIsGiven) {
+        StringBuilder inserter = new StringBuilder("INSERT INTO ")
+                .append(modelClass.getSimpleName())
+                .append('(');
+        inserter.append(fields.stream()
+                .map(Field::getName)
+                .collect(Collectors.joining(",")));
+        if (idIsGiven) {
+            inserter.append(",id");
+        }
+        inserter.append(") VALUES (")
+                .append(IntStream.range(0, fields.size())
+                        .mapToObj(i -> "?")
+                        .collect(Collectors.joining(",")));
+        if (idIsGiven) {
+            inserter.append(",?");
+        }
+        inserter.append(')');
+        log.info("Built insert statement '{}'", inserter);
+
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement insertStatement = connection.prepareStatement(inserter.toString());
+            int i = 1;
+            for (Field field : fields) {
+                Method getter = modelClass.getDeclaredMethod("get"
+                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                        + field.getName().substring(1));
+                Object getterResult = getter.invoke(value);
+                insertStatement.setObject(i++, getterResult);
+            }
+            insertStatement.setLong(i, value.getId());
+            log.info("Executing statement");
+            insertStatement.executeUpdate();
+
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT LAST_INSERT_ID()");
+            if (!resultSet.next()) {
+                return null;
+            }
+            value.setId(resultSet.getLong(1));
+        } catch (SQLException e) {
+            log.error("SQL execution failed: {}", e.toString());
+            throw new DatabaseException();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            log.error("Could not instantiate from model class");
+            throw new ReflectionException();
+        }
+        return value;
     }
 }

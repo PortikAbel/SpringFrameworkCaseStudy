@@ -24,6 +24,9 @@ public class Tour extends BaseEntity {
     private Long regionId;
 
     public String getSignShape() {
+        if (signShape == null) {
+            return null;
+        }
         return signShape.name();
     }
 
@@ -34,6 +37,9 @@ public class Tour extends BaseEntity {
     }
 
     public String getSignColour() {
+        if (signColour == null) {
+            return null;
+        }
         return signColour.name();
     }
 
