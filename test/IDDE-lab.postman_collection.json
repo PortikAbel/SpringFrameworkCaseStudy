@@ -1,0 +1,540 @@
+{
+	"info": {
+		"_postman_id": "a71733fb-c960-424c-865f-53b671c383da",
+		"name": "IDDE-lab",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "JAVA",
+			"item": [
+				{
+					"name": "Tours",
+					"item": [
+						{
+							"name": "All tours",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/tours",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"tours"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "tour by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/tours?id=1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"tours"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "new tour",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"distanceInKm\": 8.0,\r\n    \"elevationInM\": 101,\r\n    \"signShape\": \"CROSS\",\r\n    \"signColour\": \"YELLOW\",\r\n    \"daysRecommended\": 1,\r\n    \"regionId\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/paim1949-web/tours",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"tours"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "tour by ID",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/tours?id=1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"tours"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update tour by ID",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"distanceInKm\": 12.3,\r\n    \"elevationInM\": 789,\r\n    \"signShape\": \"CIRCLE\",\r\n    \"signColour\": \"BLUE\",\r\n    \"daysRecommended\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/paim1949-web/tours?id=1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"tours"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Refuges",
+					"item": [
+						{
+							"name": "All refuges",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/refuges",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"refuges"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "refuge by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/refuges",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"refuges"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "new refuge",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/refuges",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"refuges"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "refuge by ID",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/refuges",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"refuges"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update refuge by ID",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/refuges",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"refuges"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Regions",
+					"item": [
+						{
+							"name": "All regions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/regions",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"regions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "region by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/regions?id=6",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"regions"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "6"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "new region",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Bucegi\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/paim1949-web/regions",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"regions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "region by ID",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/paim1949-web/regions?id=5",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"regions"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update region by ID",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Retyezat\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/paim1949-web/regions?id=6",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"paim1949-web",
+										"regions"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "6"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "REST API",
+			"item": [
+				{
+					"name": "Tours",
+					"item": [
+						{
+							"name": "All tours",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/tours",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"tours"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "new tour",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 15,\r\n    \"distanceInKm\": 8.0,\r\n    \"elevationInM\": 101,\r\n    \"signShape\": \"CROSS\",\r\n    \"signColour\": \"YELLOW\",\r\n    \"daysRecommended\": 1,\r\n    \"regionId\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/tours",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"tours"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "new tour invalid body",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"distanceInKm\": 0,\r\n    \"elevationInM\": -101,\r\n    \"signShape\": \"COSS\",\r\n    \"daysRecommended\": 1,\r\n    \"regionId\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/tours",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"tours"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "tour by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/tours/24",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"tours",
+										"24"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update tour by ID",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"distanceInKm\": 8.11,\r\n    \"elevationInM\": 121,\r\n    \"daysRecommended\": 1,\r\n    \"regionId\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/tours/23",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"tours",
+										"23"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "tour by ID",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/tours/23",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"tours",
+										"23"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

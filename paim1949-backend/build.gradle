@@ -1,7 +1,7 @@
 // csak a függőségeket szükséges megadni, a többi beállítás a szülő deszkriptorban található
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    runtimeOnly group: 'ch.qos.logback', name:'logback-classic', version:'1.2.3'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
+    runtimeOnly group: 'ch.qos.logback', name:'logback-classic', version: '1.2.7'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.0'
