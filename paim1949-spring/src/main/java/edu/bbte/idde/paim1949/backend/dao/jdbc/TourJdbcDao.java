@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-@Profile("prod")
+@Profile("jdbc")
 public class TourJdbcDao extends AbstractJdbcDao<Tour> implements TourDao {
     public TourJdbcDao() {
         super(Tour.class);

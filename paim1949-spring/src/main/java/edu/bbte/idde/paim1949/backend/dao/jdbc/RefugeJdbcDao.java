@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-@Profile("prod")
+@Profile("jdbc")
 public class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao {
     public RefugeJdbcDao() {
         super(Refuge.class);

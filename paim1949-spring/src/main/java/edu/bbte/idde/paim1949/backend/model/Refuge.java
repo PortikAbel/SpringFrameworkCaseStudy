@@ -4,7 +4,10 @@ import edu.bbte.idde.paim1949.backend.annotation.RefToOne;
 import lombok.*;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Entity;
+
 @Repository
+@Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

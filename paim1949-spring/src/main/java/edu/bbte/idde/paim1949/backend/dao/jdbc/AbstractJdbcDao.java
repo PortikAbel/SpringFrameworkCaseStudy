@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 
 @Slf4j
 @Repository
-@Profile("prod")
+@Profile("jdbc")
 @RequiredArgsConstructor
 public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     @Autowired

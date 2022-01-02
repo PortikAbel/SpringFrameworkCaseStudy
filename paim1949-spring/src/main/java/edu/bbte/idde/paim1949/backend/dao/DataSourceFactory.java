@@ -1,4 +1,4 @@
-package edu.bbte.idde.paim1949.backend.dao.jdbc;
+package edu.bbte.idde.paim1949.backend.dao;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,17 +9,17 @@ import org.springframework.context.annotation.Profile;
 import javax.sql.DataSource;
 
 @Configuration
-@Profile("prod")
+@Profile({"jdbc", "jpa"})
 public class DataSourceFactory {
-    @Value("${jdbc.driverClass}")
+    @Value("${db.driverClass}")
     private String driverClass;
-    @Value("${jdbc.url}")
+    @Value("${db.url}")
     private String url;
-    @Value("${jdbc.userName}")
+    @Value("${db.userName}")
     private String userName;
-    @Value("${jdbc.password}")
+    @Value("${db.password}")
     private String password;
-    @Value("${jdbc.poolSize}")
+    @Value("${db.poolSize}")
     private Integer poolSize;
 
     @Bean

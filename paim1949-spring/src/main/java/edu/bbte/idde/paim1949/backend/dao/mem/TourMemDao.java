@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-@Profile("dev")
+@Profile("mem")
 public class TourMemDao extends AbstractMemDao<Tour> implements TourDao {
     @Override
     public Collection<Tour> findByRegionId(Long regionId) {

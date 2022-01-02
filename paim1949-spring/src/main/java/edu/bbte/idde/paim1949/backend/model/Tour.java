@@ -4,13 +4,17 @@ import edu.bbte.idde.paim1949.backend.annotation.RefToOne;
 import lombok.*;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Entity;
+
 @Repository
+@Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tour extends BaseEntity {
+
     public enum SignShape { CIRCLE, TRIANGLE, LINE, CROSS }
 
     public enum SignColour { RED, BLUE, YELLOW }

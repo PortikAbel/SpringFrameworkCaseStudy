@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-@Profile("dev")
+@Profile("mem")
 public class RefugeMemDao extends AbstractMemDao<Refuge> implements RefugeDao {
     @Override
     public Collection<Refuge> findByRegionId(Long regionId) {
