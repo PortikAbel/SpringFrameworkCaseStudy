@@ -157,7 +157,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         return Optional.of(selectedModel);
     }
 
-    private T getFromResultSet(ResultSet resultSet)
+    protected T getFromResultSet(ResultSet resultSet)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException,
             IllegalAccessException, SQLException {
         T selectedModel = modelClass.getDeclaredConstructor().newInstance();
@@ -170,7 +170,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
                         : resultSet.getObject(field.getName(), field.getType());
             } else {
                 attribute = field.getType().getDeclaredConstructor().newInstance();
-                Method idSetter = field.getType().getDeclaredMethod("setId", Long.class);
+                Method idSetter = field.getType().getMethod("setId", Long.class);
                 idSetter.invoke(attribute, resultSet.getLong(field.getName()));
             }
             String setterName = "set"
@@ -242,10 +242,10 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         }
         inserter.append(')');
         log.info("Built insert statement '{}'", inserter);
-        return insertValue(inserter.toString(), value);
+        return insertValue(inserter.toString(), value, idIsGiven);
     }
 
-    private T insertValue(String inserter, T value) {
+    private T insertValue(String inserter, T value, boolean withId) {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement insertStatement = connection.prepareStatement(inserter);
             int i = 1;
@@ -257,11 +257,16 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
                 if (field.getAnnotation(RefToOne.class) == null) {
                     insertStatement.setObject(i++, getterResult);
                 } else {
-                    Method idGetter = field.getType().getDeclaredMethod("getId");
+                    log.debug("get ID of object {}", getterResult);
+                    Method idGetter = field.getType().getMethod("getId");
+                    log.debug("ID getter found {}.", idGetter.getName());
                     insertStatement.setObject(i++, idGetter.invoke(getterResult));
+                    log.debug("ID set to insert statement.");
                 }
             }
-            insertStatement.setLong(i, value.getId());
+            if (withId) {
+                insertStatement.setLong(i, value.getId());
+            }
             log.info("Executing statement");
             insertStatement.executeUpdate();
 
