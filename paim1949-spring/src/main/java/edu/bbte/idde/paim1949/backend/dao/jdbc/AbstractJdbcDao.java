@@ -76,7 +76,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
                 if (field.getAnnotation(RefToOne.class) != null) {
                     creator.append(" FOREIGN KEY (")
                             .append(field.getName())
-                            .append("_id) REFERENCES ")
+                            .append(") REFERENCES ")
                             .append(field.getAnnotation(RefToOne.class).refTableName())
                             .append('(')
                             .append(field.getAnnotation(RefToOne.class).refColumnName())

@@ -5,18 +5,21 @@ import edu.bbte.idde.paim1949.backend.dao.RegionDao;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
 import edu.bbte.idde.paim1949.backend.model.Region;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
 
-@Repository
+@Repository("regionJdbcDao")
 @Profile("jdbc")
 public class RegionJdbcDao extends AbstractJdbcDao<Region> implements RegionDao {
     @Autowired
+    @Lazy
     private RefugeDao refugeDao;
     @Autowired
+    @Lazy
     private TourDao tourDao;
 
     public RegionJdbcDao() {
