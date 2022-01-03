@@ -20,10 +20,10 @@ public class Region extends BaseEntity {
     private String name;
     @IgnoreColumn
     @RefByMany(refTableName = "Tour")
-    @OneToMany
+    @OneToMany(mappedBy = "region")
     private Collection<Tour> tours;
     @IgnoreColumn
     @RefByMany(refTableName = "Refuge")
-    @OneToMany
+    @OneToMany(mappedBy = "region")
     private Collection<Refuge> refuges;
 }

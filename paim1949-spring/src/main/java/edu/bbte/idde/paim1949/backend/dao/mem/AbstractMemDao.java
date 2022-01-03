@@ -24,47 +24,33 @@ public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
     }
 
     @Override
-    public T findById(Long id) {
+    public Optional<T> findById(Long id) {
         T value = dataBase.get(id);
         log.info("Model requested: " + value);
-        return value;
+        if (value == null) {
+            return Optional.empty();
+        }
+        return Optional.of(value);
     }
 
     @Override
-    public T create(T value) {
-        Long nextId = NEXT_ID.getAndIncrement();
-        value.setId(nextId);
-        dataBase.put(nextId, value);
+    public T save(T value) {
+        Long id = value.getId();
+        if (id == null) {
+            Long nextId = NEXT_ID.getAndIncrement();
+            value.setId(nextId);
+            dataBase.put(nextId, value);
 
-        log.info("Model created: " + value);
-        return value;
-    }
-
-    @Override
-    public T update(Long id, T value) {
-        T oldValue = dataBase.get(id);
-        if (oldValue == null) {
-            value.setId(id);
-            dataBase.put(id, value);
+            log.info("Model created: {}", value);
             return value;
         }
 
-        dataBase.replace(id, value);
-
-        log.info("Model being updated."
-                + "\n\told value: " + oldValue
-                + "\n\tnew value: " + value
-        );
-        return value;
-    }
-
-    @Override
-    public T merge(Long id, T value) {
         T oldValue = dataBase.get(id);
         if (oldValue == null) {
-            return null;
+            dataBase.put(id, value);
+            log.info("Model created: {}", value);
+            return value;
         }
-
         Class<? extends BaseEntity> modelClass = value.getClass();
         Arrays.stream(modelClass.getDeclaredFields())
                 .filter(field -> field.getAnnotation(IgnoreColumn.class) == null)
@@ -84,7 +70,6 @@ public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
                         throw new ReflectionException();
                     }
                 });
-        value.setId(id);
         dataBase.replace(id, value);
 
         log.info("Model being updated."
@@ -95,15 +80,18 @@ public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean existsById(Long id) {
+        return dataBase.get(id) != null;
+    }
+
+    @Override
+    public void deleteById(Long id) {
         if (!dataBase.containsKey(id)) {
             log.debug("Model with id {} not found.", id);
-            return false;
+            return;
         }
 
         dataBase.remove(id);
         log.info("Model with id {} removed.", id);
-
-        return true;
     }
 }

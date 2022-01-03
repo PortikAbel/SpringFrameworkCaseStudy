@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Repository
 @Profile("mem")
@@ -22,17 +23,21 @@ public class RegionMemDao extends AbstractMemDao<Region> implements RegionDao {
     public Collection<Region> findAll() {
         Collection<Region> regions = super.findAll();
         for (Region region: regions) {
-            region.setRefuges(refugeDao.findByRegionId(region.getId()));
-            region.setTours(tourDao.findByRegionId(region.getId()));
+            region.setRefuges(refugeDao.findByRegion(region));
+            region.setTours(tourDao.findByRegion(region));
         }
         return regions;
     }
 
     @Override
-    public Region findById(Long id) {
-        Region region = super.findById(id);
-        region.setRefuges(refugeDao.findByRegionId(region.getId()));
-        region.setTours(tourDao.findByRegionId(region.getId()));
-        return region;
+    public Optional<Region> findById(Long id) {
+        Optional<Region> optionalRegion = super.findById(id);
+        if (!optionalRegion.isPresent()) {
+            return Optional.empty();
+        }
+        Region region = optionalRegion.get();
+        region.setRefuges(refugeDao.findByRegion(region));
+        region.setTours(tourDao.findByRegion(region));
+        return Optional.of(region);
     }
 }

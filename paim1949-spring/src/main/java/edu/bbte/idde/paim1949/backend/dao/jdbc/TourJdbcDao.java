@@ -3,6 +3,7 @@ package edu.bbte.idde.paim1949.backend.dao.jdbc;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
 import edu.bbte.idde.paim1949.backend.exception.DatabaseException;
 import edu.bbte.idde.paim1949.backend.exception.ReflectionException;
+import edu.bbte.idde.paim1949.backend.model.Region;
 import edu.bbte.idde.paim1949.backend.model.Tour;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -29,13 +30,13 @@ public class TourJdbcDao extends AbstractJdbcDao<Tour> implements TourDao {
     }
 
     @Override
-    public Collection<Tour> findByRegionId(Long regionId) {
+    public Collection<Tour> findByRegion(Region region) {
         StringBuilder selector = new StringBuilder("SELECT ");
         selector.append(fields.stream()
                 .map(Field::getName)
                 .collect(Collectors.joining(",")));
         selector.append(",id FROM ").append(modelClass.getSimpleName());
-        selector.append(" WHERE regionId=").append(regionId);
+        selector.append(" WHERE regionId=").append(region.getId());
         log.info("Built select statement: {}", selector);
 
         Collection<Tour> result = new ArrayList<>();

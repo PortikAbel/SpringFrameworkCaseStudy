@@ -11,5 +11,4 @@ public class TourReducedDto implements Serializable {
     Long id;
     Float distanceInKm;
     Integer elevationInM;
-    Long regionId;
 }

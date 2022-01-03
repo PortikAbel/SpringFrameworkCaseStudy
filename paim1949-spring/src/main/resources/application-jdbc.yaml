@@ -1,5 +1,5 @@
 db:
-  url: jdbc:mysql://localhost:3306/tour?verifyServerCertificate=false&useSSL=true
+  url: jdbc:mysql://localhost:3306/tour_jdbc_db?verifyServerCertificate=false&useSSL=true
   driverClass: com.mysql.jdbc.Driver
   poolSize: 4
   userName: root

@@ -25,7 +25,7 @@ public class Tour extends BaseEntity {
     private SignColour signColour;
     private Integer daysRecommended;
     @RefToOne(refTableName = "Region")
-    private Long regionId;
+    private Region region;
 
     public String getSignShape() {
         if (signShape == null) {

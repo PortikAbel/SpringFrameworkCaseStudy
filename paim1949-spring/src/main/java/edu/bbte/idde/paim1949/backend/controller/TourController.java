@@ -34,7 +34,7 @@ public class TourController {
 
     @GetMapping("/{tourId}")
     public TourDetailsDto findTourById(@PathVariable("tourId") Long tourId) {
-        Tour tour = tourDao.findById(tourId);
+        Tour tour = tourDao.findById(tourId).orElse(null);
 
         if (tour == null) {
             throw new NotFoundException("Tour with id " + tourId + " not found");
@@ -44,7 +44,7 @@ public class TourController {
 
     @PostMapping
     public ResponseEntity<TourDetailsDto> createTour(@RequestBody @Valid TourCreationDto tourCreationDto) {
-        Tour tour = tourDao.create(tourMapper.creationDtoToModel(tourCreationDto));
+        Tour tour = tourDao.save(tourMapper.creationDtoToModel(tourCreationDto));
         URI createUri = URI.create("/api/tours/" + tour.getId());
         return ResponseEntity.created(createUri).body(tourMapper.modelToDetailsDto(tour));
     }
@@ -55,18 +55,20 @@ public class TourController {
             @PathVariable("tourId") Long tourId,
             @RequestBody @Valid TourCreationDto tourUpdateDto) {
         Tour tourUpdateModel = tourMapper.creationDtoToModel(tourUpdateDto);
-        tourDao.update(tourId, tourUpdateModel);
+        tourUpdateModel.setId(tourId);
+        tourDao.save(tourUpdateModel);
     }
 
     @PatchMapping("/{tourId}")
     public ResponseEntity<TourDetailsDto> mergeTour(
             @PathVariable("tourId") Long tourId,
             @RequestBody @Valid TourUpdateDto tourUpdateDto) {
-        Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto);
-        Tour mergedTour = tourDao.merge(tourId, tourUpdateModel);
-        if (mergedTour == null) {
+        if (!tourDao.existsById(tourId)) {
             throw new NotFoundException("Tour with id " + tourId + " does not exists");
         }
+        Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto);
+        tourUpdateModel.setId(tourId);
+        Tour mergedTour = tourDao.save(tourUpdateModel);
         URI mergeUri = URI.create("/api/tours/" + mergedTour.getId());
         return ResponseEntity.created(mergeUri).body(tourMapper.modelToDetailsDto(mergedTour));
     }
@@ -74,8 +76,9 @@ public class TourController {
     @DeleteMapping("/{tourId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTour(@PathVariable("tourId") Long tourId) {
-        if (!tourDao.delete(tourId)) {
+        if (!tourDao.existsById(tourId)) {
             throw new NotFoundException("Tour with id " + tourId + " not found");
         }
+        tourDao.deleteById(tourId);
     }
 }

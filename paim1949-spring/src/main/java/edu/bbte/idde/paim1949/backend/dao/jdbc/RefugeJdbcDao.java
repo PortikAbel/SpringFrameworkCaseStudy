@@ -4,6 +4,7 @@ import edu.bbte.idde.paim1949.backend.dao.RefugeDao;
 import edu.bbte.idde.paim1949.backend.exception.DatabaseException;
 import edu.bbte.idde.paim1949.backend.exception.ReflectionException;
 import edu.bbte.idde.paim1949.backend.model.Refuge;
+import edu.bbte.idde.paim1949.backend.model.Region;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -29,13 +30,13 @@ public class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao 
     }
 
     @Override
-    public Collection<Refuge> findByRegionId(Long regionId) {
+    public Collection<Refuge> findByRegion(Region region) {
         StringBuilder selector = new StringBuilder("SELECT ");
         selector.append(fields.stream()
                 .map(Field::getName)
                 .collect(Collectors.joining(",")));
         selector.append(",id FROM ").append(modelClass.getSimpleName());
-        selector.append(" WHERE regionId=").append(regionId);
+        selector.append(" WHERE regionId=").append(region);
         log.info("Built select statement: {}", selector);
 
         Collection<Refuge> result = new ArrayList<>();

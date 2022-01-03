@@ -3,17 +3,16 @@ package edu.bbte.idde.paim1949.backend.dao;
 import edu.bbte.idde.paim1949.backend.model.BaseEntity;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface Dao<T extends BaseEntity> {
     Collection<T> findAll();
 
-    T findById(Long id);
+    Optional<T> findById(Long id);
 
-    T create(T value);
+    T save(T value);
 
-    T update(Long id, T value);
+    boolean existsById(Long id);
 
-    T merge(Long id, T value);
-
-    boolean delete(Long id);
+    void deleteById(Long id);
 }
