@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Repository
 @Entity
@@ -25,6 +26,7 @@ public class Tour extends BaseEntity {
     private SignColour signColour;
     private Integer daysRecommended;
     @RefToOne(refTableName = "Region")
+    @ManyToOne
     private Region region;
 
     public String getSignShape() {

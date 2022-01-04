@@ -1,1 +1,1 @@
-spring.profiles.active: jdbc
+spring.profiles.active: jpa

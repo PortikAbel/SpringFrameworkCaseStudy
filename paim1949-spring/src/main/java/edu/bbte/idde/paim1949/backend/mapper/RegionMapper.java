@@ -1,5 +1,6 @@
 package edu.bbte.idde.paim1949.backend.mapper;
 
+import edu.bbte.idde.paim1949.backend.dto.incoming.ReferencedRegionDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.RegionCreationDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.RegionUpdateDto;
 import edu.bbte.idde.paim1949.backend.dto.outgoing.RegionDetailsDto;
@@ -22,4 +23,6 @@ public abstract class RegionMapper {
     public abstract Region creationDtoToModel(RegionCreationDto dto);
 
     public abstract Region updateDtoToModel(RegionUpdateDto dto);
+
+    public abstract Region referencedDtoToModel(ReferencedRegionDto dto);
 }

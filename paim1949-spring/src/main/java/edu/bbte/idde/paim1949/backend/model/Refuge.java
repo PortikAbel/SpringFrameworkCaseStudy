@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Repository
 @Entity
@@ -14,9 +15,14 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Refuge extends BaseEntity {
+
     private Integer nrOfRooms;
+
     private Integer nrOfBeds;
+
     private Boolean isOpenAtWinter;
+
     @RefToOne(refTableName = "Region")
+    @ManyToOne
     private Region region;
 }
