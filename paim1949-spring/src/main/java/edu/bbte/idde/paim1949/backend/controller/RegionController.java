@@ -44,7 +44,6 @@ public class RegionController {
     @Autowired
     RefugeMapper refugeMapper;
 
-
     @GetMapping
     public Collection<RegionReducedDto> findAllRegions() {
         return regionMapper.modelsToReducedDtos(regionDao.findAll());
