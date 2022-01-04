@@ -156,4 +156,40 @@ public class RegionController {
         }
         regionDao.deleteById(regionId);
     }
+
+    @DeleteMapping("/{regionId}/tours/{tourId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTourOfRegion(@PathVariable("regionId") Long regionId, @PathVariable("tourId") Long tourId) {
+        if (!regionDao.existsById(regionId)) {
+            throw new NotFoundException("Region with id " + regionId + " not found");
+        }
+        if (!tourDao.existsById(tourId)) {
+            throw new NotFoundException("Tour with id " + tourId + " not found");
+        }
+        Region region = regionDao.findById(regionId).orElse(null);
+        Tour tour = tourDao.findById(tourId).orElse(null);
+        assert region != null && tour != null;
+
+        region.getTours().remove(tour);
+        regionDao.save(region);
+        tourDao.deleteById(tourId);
+    }
+
+    @DeleteMapping("/{regionId}/refuges/{refugeId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteRefugeOfRegion(@PathVariable("regionId") Long regionId, @PathVariable("refugeId") Long refugeId) {
+        if (!regionDao.existsById(regionId)) {
+            throw new NotFoundException("Region with id " + regionId + " not found");
+        }
+        if (!refugeDao.existsById(refugeId)) {
+            throw new NotFoundException("Refuge with id " + refugeId + " not found");
+        }
+        Region region = regionDao.findById(regionId).orElse(null);
+        Refuge refuge = refugeDao.findById(refugeId).orElse(null);
+        assert region != null && refuge != null;
+
+        region.getRefuges().remove(refuge);
+        regionDao.save(region);
+        refugeDao.deleteById(refugeId);
+    }
 }
