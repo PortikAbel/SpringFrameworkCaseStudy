@@ -1,5 +1,6 @@
 package edu.bbte.idde.paim1949.backend.mapper;
 
+import edu.bbte.idde.paim1949.backend.dto.incoming.RefugeAddToRegionDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.RefugeCreationDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.RefugeUpdateDto;
 import edu.bbte.idde.paim1949.backend.dto.outgoing.RefugeDetailsDto;
@@ -20,6 +21,8 @@ public abstract class RefugeMapper {
     public abstract RefugeDetailsDto modelToDetailsDto(Refuge model);
 
     public abstract Refuge creationDtoToModel(RefugeCreationDto dto);
+
+    public abstract Refuge addToRegionDtoToModel(RefugeAddToRegionDto dto);
 
     public abstract Refuge updateDtoToModel(RefugeUpdateDto dto);
 }

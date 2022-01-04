@@ -1,5 +1,6 @@
 package edu.bbte.idde.paim1949.backend.mapper;
 
+import edu.bbte.idde.paim1949.backend.dto.incoming.TourAddToRegionDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.TourCreationDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.TourUpdateDto;
 import edu.bbte.idde.paim1949.backend.dto.outgoing.TourDetailsDto;
@@ -20,6 +21,8 @@ public abstract class TourMapper {
     public abstract TourDetailsDto modelToDetailsDto(Tour model);
 
     public abstract Tour creationDtoToModel(TourCreationDto dto);
+
+    public abstract Tour addToRegionDtoToModel(TourAddToRegionDto dto);
 
     public abstract Tour updateDtoToModel(TourUpdateDto dto);
 
