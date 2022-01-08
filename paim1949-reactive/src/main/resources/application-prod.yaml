@@ -1,0 +1,10 @@
+spring:
+  r2dbc:
+    url: r2dbc:pool:mysql://localhost:3306/tour_jpa_db?verifyServerCertificate=false&useSSL=true
+    username: root
+    password: root
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
