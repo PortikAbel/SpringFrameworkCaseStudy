@@ -3,11 +3,13 @@ package edu.bbte.idde.paim1949.backend.controller;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
 import edu.bbte.idde.paim1949.backend.dto.incoming.TourCreationDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.TourUpdateDto;
+import edu.bbte.idde.paim1949.backend.dto.incoming.requestparam.TourFilterDto;
 import edu.bbte.idde.paim1949.backend.dto.outgoing.TourDetailsDto;
 import edu.bbte.idde.paim1949.backend.dto.outgoing.TourReducedDto;
 import edu.bbte.idde.paim1949.backend.exception.NotFoundException;
 import edu.bbte.idde.paim1949.backend.mapper.TourMapper;
 import edu.bbte.idde.paim1949.backend.model.Tour;
+import edu.bbte.idde.paim1949.backend.service.TourSpecificationBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,17 +29,25 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/api/tours")
 public class TourController {
+
     @Autowired
     TourMapper tourMapper;
+
     @Autowired
     TourDao tourDao;
+
+    @Autowired
+    TourSpecificationBuilder tourSpecificationBuilder;
 
     @GetMapping
     public ResponseEntity<Collection<TourReducedDto>> findAllTours(
             @PageableDefault(size = 20)
             @SortDefault(sort = "id", direction = Sort.Direction.ASC)
-                    Pageable pageable) {
-        Page<TourReducedDto> page = tourDao.findAll(pageable).map(tourMapper::modelToReducedDto);
+                    Pageable pageable,
+            @Valid TourFilterDto tourFilterDto) {
+        Page<TourReducedDto> page = tourDao
+                .findAll(tourSpecificationBuilder.tourFilterToSpecification(tourFilterDto), pageable)
+                .map(tourMapper::modelToReducedDto);
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(page.getTotalElements()))
                 .body(page.getContent());
