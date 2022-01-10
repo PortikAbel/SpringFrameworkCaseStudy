@@ -6,9 +6,9 @@ import edu.bbte.idde.paim1949.backend.dao.RegionDao;
 import edu.bbte.idde.paim1949.backend.dao.TourDao;
 
 public class JdbcDaoFactory implements DaoFactory {
-    private final RegionDao regionDao = new RegionJdbcDao();
-    private final TourDao tourDao = new TourJdbcDao();
-    private final RefugeDao refugeDao = new RefugeJdbcDao();
+    private final TourDao tourDao = TourJdbcDao.getInstance();
+    private final RegionDao regionDao = RegionJdbcDao.getInstance();
+    private final RefugeDao refugeDao = RefugeJdbcDao.getInstance();
 
     @Override
     public TourDao getTourDao() {

@@ -17,7 +17,17 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao {
-    public RefugeJdbcDao() {
+
+    private static RefugeJdbcDao instance;
+
+    public static RefugeJdbcDao getInstance() {
+        if (instance == null) {
+            instance = new RefugeJdbcDao();
+        }
+        return instance;
+    }
+
+    private RefugeJdbcDao() {
         super(Refuge.class);
     }
 

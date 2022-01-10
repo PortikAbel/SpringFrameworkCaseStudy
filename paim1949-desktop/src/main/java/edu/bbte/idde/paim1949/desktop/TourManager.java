@@ -32,7 +32,6 @@ public class TourManager {
         tour1.setSignShape(Tour.SignShape.CIRCLE.name());
         tour1.setSignColour(Tour.SignColour.RED.name());
         tour1.setDaysRecommended(1);
-        tour1.setRegion(REGION_SERVER.findById(1L));
         TOUR_SERVER.create(tour1);
 
         Tour tour2 = new Tour();
@@ -41,7 +40,6 @@ public class TourManager {
         tour2.setSignShape(Tour.SignShape.TRIANGLE.name());
         tour2.setSignColour(Tour.SignColour.YELLOW.name());
         tour2.setDaysRecommended(2);
-        tour2.setRegion(REGION_SERVER.findById(1L));
         TOUR_SERVER.create(tour2);
 
         Tour tour3 = new Tour();
@@ -50,7 +48,6 @@ public class TourManager {
         tour3.setSignShape(Tour.SignShape.LINE.name());
         tour3.setSignColour(Tour.SignColour.RED.name());
         tour3.setDaysRecommended(2);
-        tour3.setRegion(REGION_SERVER.findById(2L));
         TOUR_SERVER.create(tour3);
     }
 
@@ -94,7 +91,6 @@ public class TourManager {
         newTour.setSignShape(oldTour.getSignShape());
         newTour.setSignColour(oldTour.getSignColour());
         newTour.setDaysRecommended(oldTour.getDaysRecommended());
-        newTour.setRegion(oldTour.getRegion());
         TOUR_SERVER.update(firstTourId, newTour);
         TOUR_SERVER.findById(firstTourId);
     }

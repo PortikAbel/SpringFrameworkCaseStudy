@@ -1,6 +1,5 @@
 package edu.bbte.idde.paim1949.backend.model;
 
-import edu.bbte.idde.paim1949.backend.annotation.RefToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,8 +17,6 @@ public class Tour extends BaseEntity {
     private SignShape signShape;
     private SignColour signColour;
     private Integer daysRecommended;
-    @RefToOne
-    private Region region;
 
     public String getSignShape() {
         return signShape.name();

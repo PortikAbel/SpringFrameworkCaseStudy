@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface RefByMany {
     String refTableName() default "";
-    String refColumnName() default "id";
+    String refBy() default "";
     boolean eagerFetch() default false;
 }
