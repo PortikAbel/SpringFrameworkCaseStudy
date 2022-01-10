@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class AbstractMemDao<T extends BaseEntity> implements Dao<T> {
     protected final Map<Long, T> dataBase = new ConcurrentHashMap<>();
-    private static final AtomicLong NEXT_ID = new AtomicLong();
+    private static final AtomicLong NEXT_ID = new AtomicLong(1);
 
     @Override
     public Collection<T> findAll() {

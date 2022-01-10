@@ -32,7 +32,7 @@ public class TourManager {
         tour1.setSignShape(Tour.SignShape.CIRCLE.name());
         tour1.setSignColour(Tour.SignColour.RED.name());
         tour1.setDaysRecommended(1);
-        tour1.setRegionId(0L);
+        tour1.setRegion(REGION_SERVER.findById(1L));
         TOUR_SERVER.create(tour1);
 
         Tour tour2 = new Tour();
@@ -41,7 +41,7 @@ public class TourManager {
         tour2.setSignShape(Tour.SignShape.TRIANGLE.name());
         tour2.setSignColour(Tour.SignColour.YELLOW.name());
         tour2.setDaysRecommended(2);
-        tour2.setRegionId(0L);
+        tour2.setRegion(REGION_SERVER.findById(1L));
         TOUR_SERVER.create(tour2);
 
         Tour tour3 = new Tour();
@@ -50,7 +50,7 @@ public class TourManager {
         tour3.setSignShape(Tour.SignShape.LINE.name());
         tour3.setSignColour(Tour.SignColour.RED.name());
         tour3.setDaysRecommended(2);
-        tour3.setRegionId(1L);
+        tour3.setRegion(REGION_SERVER.findById(2L));
         TOUR_SERVER.create(tour3);
     }
 
@@ -59,7 +59,7 @@ public class TourManager {
         refuge.setNrOfRooms(1);
         refuge.setNrOfBeds(8);
         refuge.setIsOpenAtWinter(true);
-        refuge.setRegionId(1L);
+        refuge.setRegion(REGION_SERVER.findById(2L));
         REFUGE_SERVER.create(refuge);
     }
 
@@ -94,7 +94,7 @@ public class TourManager {
         newTour.setSignShape(oldTour.getSignShape());
         newTour.setSignColour(oldTour.getSignColour());
         newTour.setDaysRecommended(oldTour.getDaysRecommended());
-        newTour.setRegionId(oldTour.getRegionId());
+        newTour.setRegion(oldTour.getRegion());
         TOUR_SERVER.update(firstTourId, newTour);
         TOUR_SERVER.findById(firstTourId);
     }

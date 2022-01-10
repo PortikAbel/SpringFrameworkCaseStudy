@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface RefByMany {
-    String refTableName();
+    String refTableName() default "";
     String refColumnName() default "id";
+    boolean eagerFetch() default false;
 }

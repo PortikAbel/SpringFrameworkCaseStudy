@@ -12,6 +12,6 @@ public class Refuge extends BaseEntity {
     private Integer nrOfRooms;
     private Integer nrOfBeds;
     private Boolean isOpenAtWinter;
-    @RefToOne(refTableName = "Region")
-    private Long regionId;
+    @RefToOne
+    private Region region;
 }
