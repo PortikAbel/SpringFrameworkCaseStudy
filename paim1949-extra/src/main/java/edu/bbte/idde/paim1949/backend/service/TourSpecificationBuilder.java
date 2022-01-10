@@ -18,34 +18,34 @@ public class TourSpecificationBuilder {
                 criteriaBuilder.equal(tour.get("signColour"), Tour.SignColour.valueOf(signColour));
     }
 
-    private static Specification<Tour> minDistance(String distanceInKm) {
+    private static Specification<Tour> minDistance(Float distanceInKm) {
         return (tour, criteriaQuery, criteriaBuilder) ->
-                criteriaBuilder.ge(tour.get("distanceInKm"), Float.parseFloat(distanceInKm));
+                criteriaBuilder.ge(tour.get("distanceInKm"), distanceInKm);
     }
 
-    private static Specification<Tour> maxDistance(String distanceInKm) {
+    private static Specification<Tour> maxDistance(Float distanceInKm) {
         return (tour, criteriaQuery, criteriaBuilder) ->
-                criteriaBuilder.le(tour.get("distanceInKm"), Float.parseFloat(distanceInKm));
+                criteriaBuilder.le(tour.get("distanceInKm"), distanceInKm);
     }
 
-    private static Specification<Tour> minElevation(String elevationInM) {
+    private static Specification<Tour> minElevation(Integer elevationInM) {
         return (tour, criteriaQuery, criteriaBuilder) ->
-                criteriaBuilder.ge(tour.get("elevationInM"), Integer.parseInt(elevationInM));
+                criteriaBuilder.ge(tour.get("elevationInM"), elevationInM);
     }
 
-    private static Specification<Tour> maxElevation(String elevationInM) {
+    private static Specification<Tour> maxElevation(Integer elevationInM) {
         return (tour, criteriaQuery, criteriaBuilder) ->
-                criteriaBuilder.le(tour.get("elevationInM"), Integer.parseInt(elevationInM));
+                criteriaBuilder.le(tour.get("elevationInM"), elevationInM);
     }
 
-    private static Specification<Tour> minDays(String daysRecommended) {
+    private static Specification<Tour> minDays(Integer daysRecommended) {
         return (tour, criteriaQuery, criteriaBuilder) ->
-                criteriaBuilder.ge(tour.get("daysRecommended"), Integer.parseInt(daysRecommended));
+                criteriaBuilder.ge(tour.get("daysRecommended"), daysRecommended);
     }
 
-    private static Specification<Tour> maxDays(String daysRecommended) {
+    private static Specification<Tour> maxDays(Integer daysRecommended) {
         return (tour, criteriaQuery, criteriaBuilder) ->
-                criteriaBuilder.le(tour.get("daysRecommended"), Integer.parseInt(daysRecommended));
+                criteriaBuilder.le(tour.get("daysRecommended"), daysRecommended);
     }
 
     private Specification<Tour> parseDaysFilters(TourFilterDto tourFilterDto) {

@@ -1,33 +1,40 @@
 package edu.bbte.idde.paim1949.backend.dto.incoming.requestparam;
 
 import lombok.Data;
-import org.springframework.format.annotation.NumberFormat;
 
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import java.io.Serializable;
 import java.util.List;
 
 @Data
 public class TourFilterDto implements Serializable {
 
-    List<String> signShapes;
+    List<@Pattern(
+            regexp = "(CIRCLE)|(TRIANGLE)|(LINE)|(CROSS)",
+            message = "Non-existent sign shape"
+    ) String> signShapes;
 
-    List<String> signColors;
+    List<@Pattern(
+            regexp = "(RED)|(BLUE)|(YELLOW)",
+            message = "Non-existent sign colour"
+    ) String> signColors;
 
-    @NumberFormat
-    String minElevation;
+    @Positive
+    Integer minElevation;
 
-    @NumberFormat
-    String maxElevation;
+    @Positive
+    Integer maxElevation;
 
-    @NumberFormat
-    String minDistance;
+    @Positive
+    Float minDistance;
 
-    @NumberFormat
-    String maxDistance;
+    @Positive
+    Float maxDistance;
 
-    @NumberFormat
-    String minDaysRecommended;
+    @Positive
+    Integer minDaysRecommended;
 
-    @NumberFormat
-    String maxDaysRecommended;
+    @Positive
+    Integer maxDaysRecommended;
 }
