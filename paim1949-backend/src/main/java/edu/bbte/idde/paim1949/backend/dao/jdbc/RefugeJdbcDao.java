@@ -16,15 +16,14 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao {
+public final class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements RefugeDao {
 
-    private static RefugeJdbcDao instance;
+    private static class InstanceHolder {
+        public static final RefugeJdbcDao INSTANCE = new RefugeJdbcDao();
+    }
 
     public static RefugeJdbcDao getInstance() {
-        if (instance == null) {
-            instance = new RefugeJdbcDao();
-        }
-        return instance;
+        return InstanceHolder.INSTANCE;
     }
 
     private RefugeJdbcDao() {

@@ -3,15 +3,14 @@ package edu.bbte.idde.paim1949.backend.dao.jdbc;
 import edu.bbte.idde.paim1949.backend.dao.RegionDao;
 import edu.bbte.idde.paim1949.backend.model.Region;
 
-public class RegionJdbcDao extends AbstractJdbcDao<Region> implements RegionDao {
+public final class RegionJdbcDao extends AbstractJdbcDao<Region> implements RegionDao {
 
-    private static RegionJdbcDao instance;
+    private static class InstanceHolder {
+        public static final RegionJdbcDao INSTANCE = new RegionJdbcDao();
+    }
 
     public static RegionJdbcDao getInstance() {
-        if (instance == null) {
-            instance = new RegionJdbcDao();
-        }
-        return instance;
+        return InstanceHolder.INSTANCE;
     }
 
     private RegionJdbcDao() {

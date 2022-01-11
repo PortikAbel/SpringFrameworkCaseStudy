@@ -11,8 +11,8 @@ import edu.bbte.idde.paim1949.backend.model.Tour;
 import java.util.Collection;
 
 public class TourManager {
-    private static final RegionDao REGION_SERVER = AbstractDaoFactory.getDaoFactory().getRegionDao();
     private static final TourDao TOUR_SERVER = AbstractDaoFactory.getDaoFactory().getTourDao();
+    private static final RegionDao REGION_SERVER = AbstractDaoFactory.getDaoFactory().getRegionDao();
     private static final RefugeDao REFUGE_SERVER = AbstractDaoFactory.getDaoFactory().getRefugeDao();
 
     private static void populateRegions() {

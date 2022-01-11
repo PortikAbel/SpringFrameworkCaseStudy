@@ -5,15 +5,14 @@ import edu.bbte.idde.paim1949.backend.model.Tour;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TourJdbcDao extends AbstractJdbcDao<Tour> implements TourDao {
+public final class TourJdbcDao extends AbstractJdbcDao<Tour> implements TourDao {
 
-    private static TourJdbcDao instance;
+    private static class InstanceHolder {
+        public static final TourJdbcDao INSTANCE = new TourJdbcDao();
+    }
 
     public static TourJdbcDao getInstance() {
-        if (instance == null) {
-            instance = new TourJdbcDao();
-        }
-        return instance;
+        return InstanceHolder.INSTANCE;
     }
 
     private TourJdbcDao() {

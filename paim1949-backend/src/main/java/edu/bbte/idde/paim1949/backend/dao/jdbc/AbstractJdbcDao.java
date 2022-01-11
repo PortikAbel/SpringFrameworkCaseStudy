@@ -36,37 +36,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         StringBuilder creator = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
         creator.append(tableName).append('(');
         for (Field field: fields) {
-            RefByMany refByMany = field.getAnnotation(RefByMany.class);
-            if (refByMany == null) {
-                RefToOne refToOne = field.getAnnotation(RefToOne.class);
-                creator.append(field.getName())
-                        .append(' ')
-                        .append(refToOne == null
-                                ? JavaTypeToSqlType.getSqlType(field.getType())
-                                : JavaTypeToSqlType.getSqlType(Long.class))
-                        .append(',');
-                if (refToOne != null) {
-                    creator.append(" FOREIGN KEY (")
-                            .append(field.getName())
-                            .append(") REFERENCES ")
-                            .append(Objects.equals(refToOne.refTableName(), "")
-                                    ? field.getType().getSimpleName().toLowerCase(Locale.ROOT)
-                                    : refToOne.refTableName())
-                            .append('(')
-                            .append(refToOne.refColumnName())
-                            .append("),");
-                }
-            } else if (Objects.equals(refByMany.refBy(), "")) {
-                ParameterizedType collectionType = (ParameterizedType) field.getGenericType();
-                Class<?> collectionClass = (Class<?>) collectionType.getActualTypeArguments()[0];
-                String refTableName = collectionClass.getSimpleName().toLowerCase(Locale.ROOT);
-
-                String alter = "ALTER TABLE " + refTableName + " ADD COLUMN "
-                        + refTableName + '_' + tableName + ' ' + JavaTypeToSqlType.getSqlType(Long.class)
-                        + ", ADD FOREIGN KEY (" + refTableName + '_' + tableName
-                        + ") REFERENCES " + tableName + "(id)";
-                alterTables.add(alter);
-            }
+            processFieldForCreateTable(field, creator, alterTables);
         }
         creator.append("id BIGINT PRIMARY KEY AUTO_INCREMENT)");
 
@@ -87,6 +57,40 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             log.error("Could not create table {}: {}", tableName, e.toString());
         } finally {
             connectionPool.returnConnection(connection);
+        }
+    }
+
+    private void processFieldForCreateTable(Field field, StringBuilder creator, List<String> alterTables) {
+        RefByMany refByMany = field.getAnnotation(RefByMany.class);
+        if (refByMany == null) {
+            RefToOne refToOne = field.getAnnotation(RefToOne.class);
+            creator.append(field.getName())
+                    .append(' ')
+                    .append(refToOne == null
+                            ? JavaTypeToSqlType.getSqlType(field.getType())
+                            : JavaTypeToSqlType.getSqlType(Long.class))
+                    .append(',');
+            if (refToOne != null) {
+                creator.append(" FOREIGN KEY (")
+                        .append(field.getName())
+                        .append(") REFERENCES ")
+                        .append(Objects.equals(refToOne.refTableName(), "")
+                                ? field.getType().getSimpleName().toLowerCase(Locale.ROOT)
+                                : refToOne.refTableName())
+                        .append('(')
+                        .append(refToOne.refColumnName())
+                        .append("),");
+            }
+        } else if (Objects.equals(refByMany.refBy(), "")) {
+            ParameterizedType collectionType = (ParameterizedType) field.getGenericType();
+            Class<?> collectionClass = (Class<?>) collectionType.getActualTypeArguments()[0];
+            String refTableName = collectionClass.getSimpleName().toLowerCase(Locale.ROOT);
+
+            String alter = "ALTER TABLE " + refTableName + " ADD COLUMN "
+                    + refTableName + '_' + tableName + ' ' + JavaTypeToSqlType.getSqlType(Long.class)
+                    + ", ADD FOREIGN KEY (" + refTableName + '_' + tableName
+                    + ") REFERENCES " + tableName + "(id)";
+            alterTables.add(alter);
         }
     }
 
@@ -164,36 +168,43 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     protected T getFromResultSet(ResultSet resultSet)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException,
             IllegalAccessException, SQLException {
+
         T selectedModel = modelClass.getDeclaredConstructor().newInstance();
         selectedModel.setId(resultSet.getLong("id"));
         for (Field field: fields) {
-            Object attribute = null;
-            RefByMany refByMany = field.getAnnotation(RefByMany.class);
-            if (refByMany == null) {
-                RefToOne refToOne = field.getAnnotation(RefToOne.class);
-                if (refToOne == null) {
-                    attribute = field.getType().isEnum()
-                            ? resultSet.getString(field.getName())
-                            : resultSet.getObject(field.getName(), field.getType());
-                } else if (refToOne.eagerFetch()) {
-                    String refEntityName = Objects.equals(refToOne.refTableName(), "")
-                            ? field.getType().getSimpleName().toLowerCase(Locale.ROOT)
-                            : refToOne.refTableName();
-                    Method daoGetter = JdbcDaoFactory.class.getDeclaredMethod(
-                            "get" + refEntityName.substring(0, 1).toUpperCase(Locale.ROOT)
-                                    + refEntityName.substring(1) + "Dao");
-                    Dao dao = (Dao) daoGetter.invoke(JDBC_DAO_FACTORY);
-                    attribute = dao.findById(resultSet.getLong(field.getName()));
-                }
-                String setterName = "set"
-                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                        + field.getName().substring(1);
-                Method setter = modelClass.getDeclaredMethod(setterName,
-                        field.getType().isEnum() ? String.class : field.getType());
-                setter.invoke(selectedModel, attribute);
-            }
+            Object attribute = getAttribute(resultSet, field);
+            String setterName = "set"
+                    + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                    + field.getName().substring(1);
+            Method setter = modelClass.getDeclaredMethod(setterName,
+                    field.getType().isEnum() ? String.class : field.getType());
+            setter.invoke(selectedModel, attribute);
         }
         return selectedModel;
+    }
+
+    private Object getAttribute(ResultSet resultSet, Field field)
+            throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        RefByMany refByMany = field.getAnnotation(RefByMany.class);
+        if (refByMany == null) {
+            RefToOne refToOne = field.getAnnotation(RefToOne.class);
+            if (refToOne == null) {
+                return field.getType().isEnum()
+                        ? resultSet.getString(field.getName())
+                        : resultSet.getObject(field.getName(), field.getType());
+            } else if (refToOne.eagerFetch()) {
+                String refEntityName = Objects.equals(refToOne.refTableName(), "")
+                        ? field.getType().getSimpleName().toLowerCase(Locale.ROOT)
+                        : refToOne.refTableName();
+                Method daoGetter = JdbcDaoFactory.class.getDeclaredMethod(
+                        "get" + refEntityName.substring(0, 1).toUpperCase(Locale.ROOT)
+                                + refEntityName.substring(1) + "Dao");
+                Dao dao = (Dao) daoGetter.invoke(JDBC_DAO_FACTORY);
+                return dao.findById(resultSet.getLong(field.getName()));
+            }
+        }
+        return null;
     }
 
     @Override
