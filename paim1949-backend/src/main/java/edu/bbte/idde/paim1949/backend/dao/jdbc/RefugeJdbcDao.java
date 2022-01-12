@@ -47,7 +47,7 @@ public final class RefugeJdbcDao extends AbstractJdbcDao<Refuge> implements Refu
             Statement selectStatement = connection.createStatement();
             ResultSet resultSet = selectStatement.executeQuery(selector.toString());
             while (resultSet.next()) {
-                result.add(getFromResultSet(resultSet));
+                result.add((Refuge) getFromResultSet(resultSet, modelClass, fields));
             }
         } catch (JdbcException e) {
             log.error("Could not connect to database");

@@ -18,12 +18,12 @@ import java.util.stream.IntStream;
 @Slf4j
 public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     protected final ConnectionPool connectionPool;
-    protected final Class<T> modelClass;
+    protected final Class<?> modelClass;
     protected final String tableName;
     protected final List<Field> fields;
     private static final JdbcDaoFactory JDBC_DAO_FACTORY = new JdbcDaoFactory();
 
-    protected AbstractJdbcDao(Class<T> modelClass) {
+    protected AbstractJdbcDao(Class<?> modelClass) {
         this.modelClass = modelClass;
         this.tableName = modelClass.getSimpleName().toLowerCase(Locale.ROOT);
         fields = Arrays.asList(modelClass.getDeclaredFields());
@@ -112,7 +112,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             Statement selectStatement = connection.createStatement();
             ResultSet resultSet = selectStatement.executeQuery(selector.toString());
             while (resultSet.next()) {
-                result.add(getFromResultSet(resultSet));
+                result.add((T)getFromResultSet(resultSet, modelClass, fields));
             }
         } catch (JdbcException e) {
             log.error("Could not connect to database");
@@ -139,7 +139,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         selector.append(",id FROM ").append(tableName);
         selector.append(" WHERE id=").append(id);
         log.info("Built select statement: {}", selector);
-        T selectedModel = null;
+        BaseEntity selectedModel = null;
         Connection connection = null;
 
         try {
@@ -148,7 +148,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             ResultSet resultSet = statement.executeQuery(selector.toString());
 
             if (resultSet.next()) {
-                selectedModel = getFromResultSet(resultSet);
+                selectedModel = getFromResultSet(resultSet, modelClass, fields);
             }
         } catch (JdbcException e) {
             log.error("Could not connect to database");
@@ -162,17 +162,17 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         } finally {
             connectionPool.returnConnection(connection);
         }
-        return selectedModel;
+        return (T)selectedModel;
     }
 
-    protected T getFromResultSet(ResultSet resultSet)
+    protected BaseEntity getFromResultSet(ResultSet resultSet, Class<?> modelClass, List<Field> fields)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException,
             IllegalAccessException, SQLException {
 
-        T selectedModel = modelClass.getDeclaredConstructor().newInstance();
+        BaseEntity selectedModel = (BaseEntity) modelClass.getDeclaredConstructor().newInstance();
         selectedModel.setId(resultSet.getLong("id"));
         for (Field field: fields) {
-            Object attribute = getAttribute(resultSet, field);
+            Object attribute = getAttribute(resultSet, field, selectedModel.getId());
             String setterName = "set"
                     + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                     + field.getName().substring(1);
@@ -183,7 +183,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         return selectedModel;
     }
 
-    private Object getAttribute(ResultSet resultSet, Field field)
+    private Object getAttribute(ResultSet resultSet, Field field, Long id)
             throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
         RefByMany refByMany = field.getAnnotation(RefByMany.class);
@@ -203,8 +203,58 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
                 Dao dao = (Dao) daoGetter.invoke(JDBC_DAO_FACTORY);
                 return dao.findById(resultSet.getLong(field.getName()));
             }
+        } else if (refByMany.eagerFetch()) {
+            ParameterizedType collectionType = (ParameterizedType) field.getGenericType();
+            Class<BaseEntity> collectionClass = (Class<BaseEntity>) collectionType.getActualTypeArguments()[0];
+            String refTableName = collectionClass.getSimpleName().toLowerCase(Locale.ROOT);
+
+            if (Objects.equals(refByMany.refBy(), "")) {
+                return findEmbeddedEntities(refTableName, refTableName + '_' + tableName, id, collectionClass);
+            } else {
+                return findEmbeddedEntities(refTableName, refByMany.refBy(), id, collectionClass);
+            }
         }
         return null;
+    }
+
+    private Collection<BaseEntity> findEmbeddedEntities(
+            String tableName, String fkName, Long fkValue, Class<BaseEntity> entityType) {
+        StringBuilder selector = new StringBuilder("SELECT ");
+        List<Field> fields = Arrays.asList(entityType.getDeclaredFields());
+        selector.append(fields.stream()
+                .filter(field -> field.getAnnotation(RefByMany.class) == null)
+                .map(Field::getName)
+                .collect(Collectors.joining(",")));
+        selector.append(",id FROM ").append(tableName)
+                .append(" WHERE ").append(fkName)
+                .append('=').append(fkValue);
+        log.info("Built select statement for embedded select: {}", selector);
+
+        Collection<BaseEntity> result = new ArrayList<>();
+        Connection connection = null;
+
+        try {
+            connection = connectionPool.getConnection();
+            Statement selectStatement = connection.createStatement();
+            ResultSet resultSet = selectStatement.executeQuery(selector.toString());
+            log.debug("start processing result set");
+            while (resultSet.next()) {
+                log.debug("get next");
+                result.add(getFromResultSet(resultSet, entityType, fields));
+            }
+        } catch (JdbcException e) {
+            log.error("Could not connect to database");
+        } catch (SQLException e) {
+            log.error("SQL execution failed: {}", e.toString());
+        } catch (InvocationTargetException
+                | InstantiationException
+                | IllegalAccessException
+                | NoSuchMethodException e) {
+            log.error("Could not instantiate from model class");
+        } finally {
+            connectionPool.returnConnection(connection);
+        }
+        return result;
     }
 
     @Override

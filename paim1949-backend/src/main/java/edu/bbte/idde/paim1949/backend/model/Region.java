@@ -14,6 +14,6 @@ public class Region extends BaseEntity {
 
     private String name;
 
-    @RefByMany
+    @RefByMany(eagerFetch = true)
     private Collection<Tour> tours;
 }

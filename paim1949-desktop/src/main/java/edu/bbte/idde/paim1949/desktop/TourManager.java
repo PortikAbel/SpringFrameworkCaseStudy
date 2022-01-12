@@ -93,5 +93,7 @@ public class TourManager {
         newTour.setDaysRecommended(oldTour.getDaysRecommended());
         TOUR_SERVER.update(firstTourId, newTour);
         TOUR_SERVER.findById(firstTourId);
+
+        System.out.println(REGION_SERVER.findAll());
     }
 }
