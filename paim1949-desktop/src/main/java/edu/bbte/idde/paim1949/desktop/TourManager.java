@@ -7,9 +7,11 @@ import edu.bbte.idde.paim1949.backend.dao.TourDao;
 import edu.bbte.idde.paim1949.backend.model.Refuge;
 import edu.bbte.idde.paim1949.backend.model.Region;
 import edu.bbte.idde.paim1949.backend.model.Tour;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 
+@Slf4j
 public class TourManager {
     private static final TourDao TOUR_SERVER = AbstractDaoFactory.getDaoFactory().getTourDao();
     private static final RegionDao REGION_SERVER = AbstractDaoFactory.getDaoFactory().getRegionDao();
@@ -94,6 +96,6 @@ public class TourManager {
         TOUR_SERVER.update(firstTourId, newTour);
         TOUR_SERVER.findById(firstTourId);
 
-        System.out.println(REGION_SERVER.findAll());
+        log.info("regions from database:\n\t{}", REGION_SERVER.findAll());
     }
 }
