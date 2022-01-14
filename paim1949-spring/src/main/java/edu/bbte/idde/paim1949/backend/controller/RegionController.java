@@ -51,34 +51,22 @@ public class RegionController {
 
     @GetMapping("/{regionId}")
     public RegionDetailsDto findRegionById(@PathVariable("regionId") Long regionId) {
-        if (!regionDao.existsById(regionId)) {
-            throw new NotFoundException("Region with id " + regionId + " not found");
-        }
-        Region region = regionDao.findById(regionId).orElse(null);
-        assert region != null;
-
+        Region region = regionDao.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
         return regionMapper.modelToDetailsDto(region);
     }
 
     @GetMapping("/{regionId}/tours")
     public Collection<TourReducedDto> findToursOfRegion(@PathVariable("regionId") Long regionId) {
-        if (!regionDao.existsById(regionId)) {
-            throw new NotFoundException("Region with id " + regionId + " not found");
-        }
-        Region region = regionDao.findById(regionId).orElse(null);
-        assert region != null;
-
+        Region region = regionDao.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
         return tourMapper.modelsToReducedDtos(region.getTours());
     }
 
     @GetMapping("/{regionId}/refuges")
     public Collection<RefugeReducedDto> findRefugesOfRegion(@PathVariable("regionId") Long regionId) {
-        if (!regionDao.existsById(regionId)) {
-            throw new NotFoundException("Region with id " + regionId + " not found");
-        }
-        Region region = regionDao.findById(regionId).orElse(null);
-        assert region != null;
-
+        Region region = regionDao.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
         return refugeMapper.modelsToReducedDtos(region.getRefuges());
     }
 
@@ -93,15 +81,11 @@ public class RegionController {
     public ResponseEntity<TourDetailsDto> addTourToRegion(
             @RequestBody @Valid TourAddToRegionDto tourAddToRegionDto,
             @PathVariable("regionId") Long regionId) {
-
-        if (!regionDao.existsById(regionId)) {
-            throw new NotFoundException("Region with id " + regionId + " not found");
-        }
+        Region region = regionDao.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
         Tour tour = tourMapper.addToRegionDtoToModel(tourAddToRegionDto);
-        Region region = regionDao.findById(regionId).orElse(null);
-        assert region != null;
-        tour.setRegion(region);
-        tourDao.save(tour);
+        region.getTours().add(tour);
+        regionDao.save(region);
         URI createUri = URI.create("/api/tours/" + tour.getId());
         return ResponseEntity.created(createUri).body(tourMapper.modelToDetailsDto(tour));
     }
@@ -110,15 +94,11 @@ public class RegionController {
     public ResponseEntity<RefugeDetailsDto> addRefugeToRegion(
             @RequestBody @Valid RefugeAddToRegionDto refugeAddToRegionDto,
             @PathVariable("regionId") Long regionId) {
-
-        if (!regionDao.existsById(regionId)) {
-            throw new NotFoundException("Region with id " + regionId + " not found");
-        }
+        Region region = regionDao.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
         Refuge refuge = refugeMapper.addToRegionDtoToModel(refugeAddToRegionDto);
-        Region region = regionDao.findById(regionId).orElse(null);
-        assert region != null;
-        refuge.setRegion(region);
-        refugeDao.save(refuge);
+        region.getRefuges().add(refuge);
+        regionDao.save(region);
         URI createUri = URI.create("/api/refuges/" + refuge.getId());
         return ResponseEntity.created(createUri).body(refugeMapper.modelToDetailsDto(refuge));
     }
@@ -159,36 +139,22 @@ public class RegionController {
     @DeleteMapping("/{regionId}/tours/{tourId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTourOfRegion(@PathVariable("regionId") Long regionId, @PathVariable("tourId") Long tourId) {
-        if (!regionDao.existsById(regionId)) {
-            throw new NotFoundException("Region with id " + regionId + " not found");
-        }
-        if (!tourDao.existsById(tourId)) {
+        Region region = regionDao.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
+        if (!region.getTours().removeIf(tour -> tour.getId().equals(tourId))) {
             throw new NotFoundException("Tour with id " + tourId + " not found");
         }
-        Region region = regionDao.findById(regionId).orElse(null);
-        Tour tour = tourDao.findById(tourId).orElse(null);
-        assert region != null && tour != null;
-
-        region.getTours().remove(tour);
         regionDao.save(region);
-        tourDao.deleteById(tourId);
     }
 
     @DeleteMapping("/{regionId}/refuges/{refugeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRefugeOfRegion(@PathVariable("regionId") Long regionId, @PathVariable("refugeId") Long refugeId) {
-        if (!regionDao.existsById(regionId)) {
-            throw new NotFoundException("Region with id " + regionId + " not found");
-        }
-        if (!refugeDao.existsById(refugeId)) {
+        Region region = regionDao.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
+        if (!region.getRefuges().removeIf(refuge -> refuge.getId().equals(refugeId))) {
             throw new NotFoundException("Refuge with id " + refugeId + " not found");
         }
-        Region region = regionDao.findById(regionId).orElse(null);
-        Refuge refuge = refugeDao.findById(refugeId).orElse(null);
-        assert region != null && refuge != null;
-
-        region.getRefuges().remove(refuge);
         regionDao.save(region);
-        refugeDao.deleteById(refugeId);
     }
 }

@@ -27,6 +27,7 @@ public class Region extends BaseEntity {
     @OneToMany(
             mappedBy = "region",
             fetch = FetchType.LAZY,
+            orphanRemoval = true,
             cascade = CascadeType.ALL
     )
     private Collection<Tour> tours;
@@ -36,6 +37,7 @@ public class Region extends BaseEntity {
     @OneToMany(
             mappedBy = "region",
             fetch = FetchType.LAZY,
+            orphanRemoval = true,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}
     )
     private Collection<Refuge> refuges;
