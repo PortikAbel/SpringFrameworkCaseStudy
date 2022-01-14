@@ -84,6 +84,7 @@ public class RegionController {
         Region region = regionDao.findById(regionId)
                 .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
         Tour tour = tourMapper.addToRegionDtoToModel(tourAddToRegionDto);
+        tour.setRegion(region);
         region.getTours().add(tour);
         regionDao.save(region);
         URI createUri = URI.create("/api/tours/" + tour.getId());
@@ -97,6 +98,7 @@ public class RegionController {
         Region region = regionDao.findById(regionId)
                 .orElseThrow(() -> new NotFoundException("Region with id " + regionId + " not found"));
         Refuge refuge = refugeMapper.addToRegionDtoToModel(refugeAddToRegionDto);
+        refuge.setRegion(region);
         region.getRefuges().add(refuge);
         regionDao.save(region);
         URI createUri = URI.create("/api/refuges/" + refuge.getId());
