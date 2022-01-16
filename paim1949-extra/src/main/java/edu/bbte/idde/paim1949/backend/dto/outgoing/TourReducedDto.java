@@ -1,14 +1,12 @@
 package edu.bbte.idde.paim1949.backend.dto.outgoing;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class TourReducedDto implements Serializable {
-    Long id;
-    Float distanceInKm;
-    Integer elevationInM;
+public class TourReducedDto extends TourCollectableDto {
+    RegionReducedDto region;
 }

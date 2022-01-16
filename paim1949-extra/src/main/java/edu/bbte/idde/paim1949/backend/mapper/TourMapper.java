@@ -3,6 +3,7 @@ package edu.bbte.idde.paim1949.backend.mapper;
 import edu.bbte.idde.paim1949.backend.dto.incoming.TourAddToRegionDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.TourCreationDto;
 import edu.bbte.idde.paim1949.backend.dto.incoming.TourUpdateDto;
+import edu.bbte.idde.paim1949.backend.dto.outgoing.TourCollectableDto;
 import edu.bbte.idde.paim1949.backend.dto.outgoing.TourDetailsDto;
 import edu.bbte.idde.paim1949.backend.dto.outgoing.TourReducedDto;
 import edu.bbte.idde.paim1949.backend.model.Tour;
@@ -17,6 +18,8 @@ public abstract class TourMapper {
 
     @IterableMapping(elementTargetType = TourReducedDto.class)
     public abstract Collection<TourReducedDto> modelsToReducedDtos(Iterable<Tour> model);
+
+    public abstract TourCollectableDto modelToCollectableDto(Tour model);
 
     public abstract TourReducedDto modelToReducedDto(Tour model);
 
