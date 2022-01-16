@@ -33,6 +33,10 @@ import java.util.Collection;
 @Slf4j
 @RestController
 @RequestMapping("/api/regions")
+@CrossOrigin(
+        origins = "http://localhost:3000",
+        exposedHeaders = "X-Total-Count"
+)
 public class RegionController {
 
     @Autowired
@@ -54,7 +58,7 @@ public class RegionController {
             @PageableDefault(size = 5)
             @SortDefault(sort = "id", direction = Sort.Direction.ASC)
                     Pageable pageable) {
-        Page<RegionReducedDto> page = regionDao.findAll(pageable).map(regionMapper::modelToDetailsDto);
+        Page<RegionReducedDto> page = regionDao.findAll(pageable).map(regionMapper::modelToReducedDto);
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(page.getTotalElements()))
                 .body(page.getContent());

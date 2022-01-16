@@ -10,6 +10,6 @@ import java.util.Collection;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class RegionDetailsDto extends RegionReducedDto {
-    Collection<TourReducedDto> tours;
+    Collection<TourCollectableDto> tours;
     Collection<RefugeReducedDto> refuges;
 }

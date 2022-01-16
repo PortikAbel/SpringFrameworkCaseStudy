@@ -28,6 +28,10 @@ import java.util.Collection;
 @Slf4j
 @RestController
 @RequestMapping("/api/tours")
+@CrossOrigin(
+        origins = "http://localhost:3000",
+        exposedHeaders = "X-Total-Count"
+)
 public class TourController {
 
     @Autowired
