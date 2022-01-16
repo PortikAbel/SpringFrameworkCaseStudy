@@ -52,11 +52,8 @@ public class RefugeController {
 
     @GetMapping("/{refugeId}")
     public RefugeDetailsDto findRefugeById(@PathVariable("refugeId") Long refugeId) {
-        Refuge refuge = refugeDao.findById(refugeId).orElse(null);
-
-        if (refuge == null) {
-            throw new NotFoundException("Refuge with id " + refugeId + " not found");
-        }
+        Refuge refuge = refugeDao.findById(refugeId)
+                .orElseThrow(() -> new NotFoundException("Refuge with id " + refugeId + " not found"));
         return refugeMapper.modelToDetailsDto(refuge);
     }
 

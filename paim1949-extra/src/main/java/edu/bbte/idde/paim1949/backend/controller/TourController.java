@@ -33,10 +33,8 @@ import java.util.Collection;
         exposedHeaders = "X-Total-Count"
 )
 public class TourController {
-
     @Autowired
     TourMapper tourMapper;
-
     @Autowired
     TourDao tourDao;
 
