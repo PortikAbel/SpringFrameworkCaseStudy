@@ -3,7 +3,6 @@ package edu.bbte.idde.paim1949.backend.model;
 import lombok.*;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
