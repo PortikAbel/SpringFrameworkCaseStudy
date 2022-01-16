@@ -68,8 +68,7 @@ public class RegionController {
     public void updateRegion(
             @PathVariable("regionId") Long regionId,
             @RequestBody @Valid RegionCreationDto regionUpdateDto) {
-        Region regionUpdateModel = regionMapper.creationDtoToModel(regionUpdateDto);
-        regionUpdateModel.setId(regionId);
+        Region regionUpdateModel = regionMapper.creationDtoToModel(regionUpdateDto, regionId);
         regionDao.save(regionUpdateModel);
     }
 
@@ -80,8 +79,7 @@ public class RegionController {
         if (!regionDao.existsById(regionId)) {
             throw new NotFoundException("Region with id " + regionId + " does not exists");
         }
-        Region regionUpdateModel = regionMapper.updateDtoToModel(regionUpdateDto);
-        regionUpdateModel.setId(regionId);
+        Region regionUpdateModel = regionMapper.updateDtoToModel(regionUpdateDto, regionId);
         Region mergedRegion = regionDao.save(regionUpdateModel);
         URI mergeUri = URI.create("/api/regions/" + mergedRegion.getId());
         return ResponseEntity.created(mergeUri).body(regionMapper.modelToDetailsDto(mergedRegion));

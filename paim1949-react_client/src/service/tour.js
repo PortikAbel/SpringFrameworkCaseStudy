@@ -1,12 +1,15 @@
 import { apiServerUrl } from "./config";
 
-export async function findTours(index, size, filters) {
-  let filterQuery = '';
+export async function findTours(index, size, filters, sorting) {
+  let filterQuery = '', sort = '';
   for (const filter in filters) {
     filterQuery = filterQuery.concat(`&${filter}=${filters[filter]}`)
   }
+  if (sorting.name) {
+    sort = `&sort=${sorting.name},${sorting.direction}`;
+  }
   const response = await fetch(
-    `${apiServerUrl}/tours?page=${index-1}&size=${size}${filterQuery}`);
+    `${apiServerUrl}/tours?page=${index-1}&size=${size}${filterQuery}${sort}`);
   if (!response.ok) {
     throw response.statusText;
   }
@@ -37,8 +40,8 @@ export async function createTour(tour) {
   }
 }
 
-export async function updateTour(tour) {
-  const response = await fetch(`${apiServerUrl}/tours`, {
+export async function updateTour(tour, id) {
+  const response = await fetch(`${apiServerUrl}/tours/${id}`, {
     headers: {
       'Content-Type': 'application/json',
     },

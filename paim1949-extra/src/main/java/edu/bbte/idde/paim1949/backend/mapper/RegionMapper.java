@@ -18,7 +18,9 @@ public abstract class RegionMapper {
 
     public abstract Region creationDtoToModel(RegionCreationDto dto);
 
-    public abstract Region updateDtoToModel(RegionUpdateDto dto);
+    public abstract Region creationDtoToModel(RegionCreationDto dto, Long id);
+
+    public abstract Region updateDtoToModel(RegionUpdateDto dto, Long id);
 
     public abstract Region referencedDtoToModel(ReferencedRegionDto dto);
 }

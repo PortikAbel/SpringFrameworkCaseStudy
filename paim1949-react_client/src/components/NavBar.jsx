@@ -13,6 +13,7 @@ export default class NavBar extends React.Component {
     return (
       <nav>
         <Button variant="link"><Link to="/">Home</Link></Button>
+        <Button variant="link"><Link to="/tours">Tours</Link></Button>
         <Button variant="link"><Link to="/regions/create">Add region</Link></Button>
       </nav>
     )

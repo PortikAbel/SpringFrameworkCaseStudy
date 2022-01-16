@@ -24,7 +24,9 @@ public abstract class RefugeMapper {
 
     public abstract Refuge creationDtoToModel(RefugeCreationDto dto);
 
+    public abstract Refuge creationDtoToModel(RefugeCreationDto dto, Long id);
+
     public abstract Refuge addToRegionDtoToModel(RefugeAddToRegionDto dto);
 
-    public abstract Refuge updateDtoToModel(RefugeUpdateDto dto);
+    public abstract Refuge updateDtoToModel(RefugeUpdateDto dto, Long id);
 }

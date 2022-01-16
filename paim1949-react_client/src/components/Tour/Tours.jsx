@@ -1,12 +1,13 @@
 import React from "react";
 import autoBind from "auto-bind";
-import { Col, Row, Table } from "react-bootstrap";
+import { Badge, Col, Row, Table } from "react-bootstrap";
 
 import Tour from "./Tour";
 import Paginator from "../Paginator";
 
 import { findTours, deleteTourById } from "../../service/tour";
 import TourFilterForm from "./TourFilterForm";
+import SortingTableHeading from "../SortingTableHeading";
 
 export default class Tours extends React.Component {
   constructor(props) {
@@ -17,6 +18,7 @@ export default class Tours extends React.Component {
       pageSize: 10,
       pageIndex: 1,
       filters: {},
+      sorting: {},
       err: null
     };
     autoBind(this);
@@ -27,9 +29,10 @@ export default class Tours extends React.Component {
   }
 
   async loadPage(index) {
+    this.setState({pageIndex: index});
     try {
-      const { pageSize, filters } = this.state;
-      const result = await findTours(index, pageSize, filters);
+      const { pageSize, filters, sorting } = this.state;
+      const result = await findTours(index, pageSize, filters, sorting);
       this.setState(result);
     } catch (err) {
       this.setState({err});
@@ -48,28 +51,37 @@ export default class Tours extends React.Component {
   }
 
   async onSearch(filters) {
-    this.setState({filters});
+    this.setState({ filters, pageIndex: 0 });
     await this.loadPage(this.state.pageIndex);
   }
 
+  async onSort(sorting) {
+    const oldSorting = this.state.sorting;
+    if (oldSorting.name === sorting.name 
+      && oldSorting.direction === sorting.direction) {
+      sorting = {};
+    }
+    this.setState({sorting}, async () => await this.loadPage(this.state.pageIndex));
+  }
+
   render() {
-    const { tours, totalCount, pageIndex, pageSize } = this.state;
+    const { tours, totalCount, pageIndex, pageSize, sorting } = this.state;
 
     return (
-      tours.length === 0
-      ? <div>No tours to show.</div>
-      : <Row>
-          <Col>
-            <TourFilterForm onSearch={this.onSearch}/>
-          </Col>
-          <Col>
+      <Row>
+        <Col>
+          <TourFilterForm onSearch={this.onSearch}/>
+        </Col>
+        {tours.length === 0
+        ? <div>No tours to show.</div>
+        : <Col>
             <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Region</th>
-                  <th>Distance</th>
-                  <th>Elevtion</th>
+                  <SortingTableHeading title='Region' name='region' sorting={sorting} onSort={this.onSort}/>
+                  <SortingTableHeading title='Distance' name='distanceInKm' sorting={sorting} onSort={this.onSort}/>
+                  <SortingTableHeading title='Elevtion' name='elevationInM' sorting={sorting} onSort={this.onSort}/>
                 </tr>
               </thead>
               <tbody>
@@ -87,11 +99,12 @@ export default class Tours extends React.Component {
               </tbody>
             </Table>
             <Paginator
-              count={Math.ceil(tours.length*1.0/totalCount)}
+              count={Math.ceil(totalCount*1.0/pageSize)}
               active={pageIndex}
               changePage={this.loadPage}/>
           </Col>
-        </Row>
+        }
+      </Row>
     )
   }
 }

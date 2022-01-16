@@ -27,8 +27,9 @@ public abstract class TourMapper {
 
     public abstract Tour creationDtoToModel(TourCreationDto dto);
 
+    public abstract Tour creationDtoToModel(TourCreationDto dto, Long id);
+
     public abstract Tour addToRegionDtoToModel(TourAddToRegionDto dto);
 
-    public abstract Tour updateDtoToModel(TourUpdateDto dto);
-
+    public abstract Tour updateDtoToModel(TourUpdateDto dto, Long id);
 }

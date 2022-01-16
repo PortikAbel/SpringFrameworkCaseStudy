@@ -27,8 +27,7 @@ public class Tour extends BaseEntity {
     private SignColour signColour;
     private Integer daysRecommended;
     @ManyToOne(
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE}
+            fetch = FetchType.EAGER
     )
     private Region region;
 

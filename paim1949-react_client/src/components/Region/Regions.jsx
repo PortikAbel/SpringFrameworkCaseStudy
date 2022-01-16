@@ -67,7 +67,7 @@ export default class Regions extends React.Component {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Name</th>
+                  <th>Name &#9650;&#9660;</th>
                 </tr>
               </thead>
               <tbody>

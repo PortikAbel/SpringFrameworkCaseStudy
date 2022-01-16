@@ -77,8 +77,7 @@ public class TourController {
     public void updateTour(
             @PathVariable("tourId") Long tourId,
             @RequestBody @Valid TourCreationDto tourUpdateDto) {
-        Tour tourUpdateModel = tourMapper.creationDtoToModel(tourUpdateDto);
-        tourUpdateModel.setId(tourId);
+        Tour tourUpdateModel = tourMapper.creationDtoToModel(tourUpdateDto, tourId);
         tourDao.save(tourUpdateModel);
     }
 
@@ -89,8 +88,7 @@ public class TourController {
         if (!tourDao.existsById(tourId)) {
             throw new NotFoundException("Tour with id " + tourId + " does not exists");
         }
-        Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto);
-        tourUpdateModel.setId(tourId);
+        Tour tourUpdateModel = tourMapper.updateDtoToModel(tourUpdateDto, tourId);
         Tour mergedTour = tourDao.save(tourUpdateModel);
         URI mergeUri = URI.create("/api/tours/" + mergedTour.getId());
         return ResponseEntity.created(mergeUri).body(tourMapper.modelToDetailsDto(mergedTour));

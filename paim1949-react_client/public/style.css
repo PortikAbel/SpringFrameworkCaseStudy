@@ -2,6 +2,10 @@
   height: 50px;
 }
 
+.no-text-select {
+  pointer-events: none;
+}
+
 main {
   margin-top: 2%;
   margin-left: 1%;

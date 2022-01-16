@@ -8,7 +8,7 @@ export default class TourDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      tour: {}
+      tour: null
     }
     autoBind(this);
   }
@@ -20,15 +20,16 @@ export default class TourDetails extends React.Component {
 
   render() {
     const { tour } = this.state;
-    return (
-      <>
-        <h1>
-          <Badge className="badge bg-primary">{tour.region.name}</Badge>
-          <Link to={`/tours/${tour.id}/update`}>
-            <img src="/resources/update.png" alt="update" className="icon"/>
-          </Link>
-        </h1>
-      </>
+    return (tour
+      ? <>
+          <h1>
+            <Badge className="badge bg-primary">{tour.region.name}</Badge>
+            <Link to={`/tours/${tour.id}/update`}>
+              <img src="/resources/update.png" alt="update" className="icon"/>
+            </Link>
+          </h1>
+        </>
+      : <h1>Loading...</h1>
     )
   }
 }

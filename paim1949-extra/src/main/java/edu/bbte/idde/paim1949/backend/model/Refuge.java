@@ -24,8 +24,7 @@ public class Refuge extends BaseEntity {
     private Boolean isOpenAtWinter;
 
     @ManyToOne(
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE}
+            fetch = FetchType.EAGER
     )
     private Region region;
 }

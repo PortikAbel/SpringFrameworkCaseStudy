@@ -27,6 +27,10 @@ import java.util.Collection;
 @Slf4j
 @RestController
 @RequestMapping("/api/regions")
+@CrossOrigin(
+        origins = "http://localhost:3000",
+        exposedHeaders = "X-Total-Count"
+)
 public class RefugesOfRegionController {
 
     @Autowired

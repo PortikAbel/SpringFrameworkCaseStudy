@@ -69,8 +69,7 @@ public class RefugeController {
     public void updateRefuge(
             @PathVariable("refugeId") Long refugeId,
             @RequestBody @Valid RefugeCreationDto refugeUpdateDto) {
-        Refuge refugeUpdateModel = refugeMapper.creationDtoToModel(refugeUpdateDto);
-        refugeUpdateModel.setId(refugeId);
+        Refuge refugeUpdateModel = refugeMapper.creationDtoToModel(refugeUpdateDto, refugeId);
         refugeDao.save(refugeUpdateModel);
     }
 
@@ -81,8 +80,7 @@ public class RefugeController {
         if (!refugeDao.existsById(refugeId)) {
             throw new NotFoundException("Refuge with id " + refugeId + " does not exists");
         }
-        Refuge refugeUpdateModel = refugeMapper.updateDtoToModel(refugeUpdateDto);
-        refugeUpdateModel.setId(refugeId);
+        Refuge refugeUpdateModel = refugeMapper.updateDtoToModel(refugeUpdateDto, refugeId);
         Refuge mergedRefuge = refugeDao.save(refugeUpdateModel);
         URI mergeUri = URI.create("/api/refuges/" + mergedRefuge.getId());
         return ResponseEntity.created(mergeUri).body(refugeMapper.modelToDetailsDto(mergedRefuge));

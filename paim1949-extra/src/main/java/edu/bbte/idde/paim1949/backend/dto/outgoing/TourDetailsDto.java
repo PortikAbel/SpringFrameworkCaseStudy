@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class TourDetailsDto extends TourCollectableDto {
+public class TourDetailsDto extends TourReducedDto {
     Tour.SignShape signShape;
     Tour.SignColour signColour;
     Integer daysRecommended;
