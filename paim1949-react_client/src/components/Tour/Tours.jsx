@@ -1,6 +1,6 @@
 import React from "react";
 import autoBind from "auto-bind";
-import { Badge, Col, Row, Table } from "react-bootstrap";
+import { Col, Form, Row, Table } from "react-bootstrap";
 
 import Tour from "./Tour";
 import Paginator from "../Paginator";
@@ -50,18 +50,30 @@ export default class Tours extends React.Component {
     }
   }
 
-  async onSearch(filters) {
-    this.setState({ filters, pageIndex: 0 });
-    await this.loadPage(this.state.pageIndex);
+  onSearch(filters) {
+    this.setState(
+      { filters, pageIndex: 0 }, 
+      () => this.loadPage(this.state.pageIndex)
+    );
   }
 
-  async onSort(sorting) {
+  onSort(sorting) {
     const oldSorting = this.state.sorting;
     if (oldSorting.name === sorting.name 
       && oldSorting.direction === sorting.direction) {
       sorting = {};
     }
-    this.setState({sorting}, async () => await this.loadPage(this.state.pageIndex));
+    this.setState(
+      {sorting}, 
+      () => this.loadPage(this.state.pageIndex)
+    );
+  }
+
+  onChangePageSize(event) {
+    this.setState(
+      {pageSize: event.target.value},
+      () => this.loadPage(this.state.pageIndex)
+    );
   }
 
   render() {
@@ -98,10 +110,28 @@ export default class Tours extends React.Component {
                 }
               </tbody>
             </Table>
-            <Paginator
-              count={Math.ceil(totalCount*1.0/pageSize)}
-              active={pageIndex}
-              changePage={this.loadPage}/>
+            <Row>
+              <Col>
+                <Paginator
+                  count={Math.ceil(totalCount*1.0/pageSize)}
+                  active={pageIndex}
+                  changePage={this.loadPage}/>
+              </Col>
+              <Col>
+                <Form>
+                  <Form.Group as={Row}>
+                    <Form.Label column>result&nbsp;per&nbsp;page:</Form.Label>
+                    <Col>
+                      <Form.Control as="select" value={pageSize} onChange={this.onChangePageSize}>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                      </Form.Control>
+                    </Col>
+                  </Form.Group>
+                </Form>
+              </Col>
+            </Row>
           </Col>
         }
       </Row>
