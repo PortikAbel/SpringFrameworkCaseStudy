@@ -1,0 +1,4 @@
+dependencies {
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.4.1'
+    runtimeOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
+}

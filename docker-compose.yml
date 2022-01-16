@@ -1,0 +1,52 @@
+version: '3'
+services:
+  api-dev:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        profile: dev
+    #image: portik22/idde_api_dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    profiles:
+      - dev
+
+  api-prod:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        profile: prod
+    #image: portik22/idde_api_prod
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/tour_jpa_db?verifyServerCertificate=false&useSSL=true
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    links:
+      - mysql
+    profiles:
+      - prod
+
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: tour_jpa_db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  web:
+    build: paim1949-react_client/
+    image: portik22/idde/react-client
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

@@ -1,5 +1,4 @@
-// almodulok definiciója relatív elérési útvonal szerint
-include 'paim1949-backend', 'paim1949-desktop', 'paim1949-web', 'paim1949-spring'
-include 'paim1949-reactive'
-include 'paim1949-extra'
+rootProject.name = 'idde-paim1949'
 
+// almodulok definiciója relatív elérési útvonal szerint
+include 'paim1949-extra'
