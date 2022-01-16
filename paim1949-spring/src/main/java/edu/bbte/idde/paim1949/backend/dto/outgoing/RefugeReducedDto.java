@@ -7,8 +7,9 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class TourReducedDto implements Serializable {
+public class RefugeReducedDto implements Serializable {
     Long id;
-    Float distanceInKm;
-    Integer elevationInM;
+    private Integer nrOfRooms;
+    private Integer nrOfBeds;
+    private Boolean isOpenAtWinter;
 }

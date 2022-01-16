@@ -2,14 +2,13 @@ package edu.bbte.idde.paim1949.backend.dto.incoming;
 
 import lombok.Data;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import java.io.Serializable;
 
 @Data
-public class TourCreationDto implements Serializable {
+public class TourAddToRegionDto implements Serializable {
 
     @Positive
     @NotNull
@@ -18,10 +17,6 @@ public class TourCreationDto implements Serializable {
     @Positive
     @NotNull
     Integer elevationInM;
-
-    @Valid
-    @NotNull
-    ReferencedRegionDto region;
 
     @Pattern(
             regexp = "(CIRCLE)|(TRIANGLE)|(LINE)|(CROSS)",

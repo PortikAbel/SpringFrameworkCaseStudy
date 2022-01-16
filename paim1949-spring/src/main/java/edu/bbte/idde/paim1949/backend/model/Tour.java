@@ -4,13 +4,20 @@ import edu.bbte.idde.paim1949.backend.annotation.RefToOne;
 import lombok.*;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+
 @Repository
+@Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tour extends BaseEntity {
+
     public enum SignShape { CIRCLE, TRIANGLE, LINE, CROSS }
 
     public enum SignColour { RED, BLUE, YELLOW }
@@ -21,7 +28,11 @@ public class Tour extends BaseEntity {
     private SignColour signColour;
     private Integer daysRecommended;
     @RefToOne(refTableName = "Region")
-    private Long regionId;
+    @ManyToOne(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    private Region region;
 
     public String getSignShape() {
         if (signShape == null) {

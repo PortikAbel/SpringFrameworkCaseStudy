@@ -7,8 +7,7 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class TourReducedDto implements Serializable {
+public class RegionReducedDto implements Serializable {
     Long id;
-    Float distanceInKm;
-    Integer elevationInM;
+    String name;
 }

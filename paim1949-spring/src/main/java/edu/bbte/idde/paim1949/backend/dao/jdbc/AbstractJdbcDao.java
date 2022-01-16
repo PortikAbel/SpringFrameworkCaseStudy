@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 
 @Slf4j
 @Repository
-@Profile("prod")
+@Profile("jdbc")
 @RequiredArgsConstructor
 public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     @Autowired
@@ -69,7 +69,9 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             for (Field field: fields) {
                 creator.append(field.getName())
                         .append(' ')
-                        .append(TYPE_TO_SQL_TYPE.get(field.getType()))
+                        .append(field.getAnnotation(RefToOne.class) == null
+                                ? TYPE_TO_SQL_TYPE.get(field.getType())
+                                : TYPE_TO_SQL_TYPE.get(Long.class))
                         .append(',');
                 if (field.getAnnotation(RefToOne.class) != null) {
                     creator.append(" FOREIGN KEY (")
@@ -107,20 +109,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             Statement selectStatement = connection.createStatement();
             ResultSet resultSet = selectStatement.executeQuery(selector.toString());
             while (resultSet.next()) {
-                T selectedModel = modelClass.getDeclaredConstructor().newInstance();
-                selectedModel.setId(resultSet.getLong("id"));
-                for (Field field: fields) {
-                    Object attribute = field.getType().isEnum()
-                            ? resultSet.getString(field.getName())
-                            : resultSet.getObject(field.getName(), field.getType());
-                    String setterName = "set"
-                            + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                            + field.getName().substring(1);
-                    Method setter = modelClass.getDeclaredMethod(setterName,
-                            field.getType().isEnum() ? String.class : field.getType());
-                    setter.invoke(selectedModel, attribute);
-                }
-                result.add(selectedModel);
+                result.add(getFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
@@ -136,7 +125,7 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
     }
 
     @Override
-    public T findById(Long id) {
+    public Optional<T> findById(Long id) {
         StringBuilder selector = new StringBuilder("SELECT ");
         selector.append(fields.stream()
                 .map(Field::getName)
@@ -151,21 +140,10 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             ResultSet resultSet = statement.executeQuery(selector.toString());
 
             if (!resultSet.next()) {
-                return null;
+                return Optional.empty();
             }
-            selectedModel = modelClass.getDeclaredConstructor().newInstance();
-            selectedModel.setId(resultSet.getLong("id"));
-            for (Field field: fields) {
-                Object attribute = field.getType().isEnum()
-                        ? resultSet.getString(field.getName())
-                        : resultSet.getObject(field.getName(), field.getType());
-                String setterName = "set"
-                        + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                        + field.getName().substring(1);
-                Method setter = modelClass.getDeclaredMethod(setterName,
-                        field.getType().isEnum() ? String.class : field.getType());
-                setter.invoke(selectedModel, attribute);
-            }
+
+            selectedModel = getFromResultSet(resultSet);
         } catch (SQLException e) {
             log.error("SQL execution failed: {}", e.toString());
             throw new DatabaseException();
@@ -176,117 +154,57 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             log.error("Could not instantiate from model class");
             throw new ReflectionException();
         }
+        return Optional.of(selectedModel);
+    }
+
+    protected T getFromResultSet(ResultSet resultSet)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException, SQLException {
+        T selectedModel = modelClass.getDeclaredConstructor().newInstance();
+        selectedModel.setId(resultSet.getLong("id"));
+        for (Field field: fields) {
+            Object attribute;
+            if (field.getAnnotation(RefToOne.class) == null) {
+                attribute = field.getType().isEnum()
+                        ? resultSet.getString(field.getName())
+                        : resultSet.getObject(field.getName(), field.getType());
+            } else {
+                attribute = field.getType().getDeclaredConstructor().newInstance();
+                Method idSetter = field.getType().getMethod("setId", Long.class);
+                idSetter.invoke(attribute, resultSet.getLong(field.getName()));
+            }
+            String setterName = "set"
+                    + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                    + field.getName().substring(1);
+            Method setter = modelClass.getDeclaredMethod(setterName,
+                    field.getType().isEnum() ? String.class : field.getType());
+            setter.invoke(selectedModel, attribute);
+        }
         return selectedModel;
     }
 
     @Override
-    public T create(T value) {
-        return insert(value, false);
-    }
-
-    @Override
-    public T update(Long id, T value) {
-        T oldValue = findById(id);
+    public T save(T value) {
+        if (value.getId() == null) {
+            return insert(value, false);
+        }
+        T oldValue = findById(value.getId()).orElse(null);
         if (oldValue == null) {
-            value.setId(id);
             return insert(value, true);
         }
-
-        StringBuilder updater = new StringBuilder("UPDATE ")
-                .append(modelClass.getSimpleName())
-                .append(" SET ");
-        updater.append(fields.stream()
-                .map(field -> field.getName() + "=?")
-                .collect(Collectors.joining(",")));
-        updater.append(" WHERE id=?");
-        log.info("Built update statement '{}'", updater);
-
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement updateStatement = connection.prepareStatement(updater.toString());
-            int i = 1;
-            for (Field field : fields) {
-                String suffixGetterSetter = field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                        + field.getName().substring(1);
-                Method getter = modelClass.getDeclaredMethod("get" + suffixGetterSetter);
-                Object getterResult = getter.invoke(value);
-                Method setter = modelClass.getDeclaredMethod("set" + suffixGetterSetter,
-                        field.getType().isEnum() ? String.class : field.getType());
-                setter.invoke(oldValue, getterResult);
-                updateStatement.setObject(i++, getterResult);
-            }
-            updateStatement.setLong(i, id);
-            log.info("Executing statement");
-            updateStatement.executeUpdate();
-        } catch (SQLException e) {
-            log.error("SQL execution failed.");
-            throw new DatabaseException();
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            log.error("Could not instantiate from model class");
-            throw new ReflectionException();
-        }
-        return oldValue;
+        return update(oldValue, value);
     }
 
     @Override
-    public T merge(Long id, T value) {
-        T oldValue = findById(id);
-        if (oldValue == null) {
-            return null;
-        }
-
-        List<Field> fieldsToUpdate = fields.stream()
-                .filter(field -> {
-                    try {
-                        Method getter = modelClass.getDeclaredMethod("get"
-                                + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                                + field.getName().substring(1));
-                        Object getterResult = getter.invoke(value);
-                        return getterResult != null;
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                        log.error("Could not instantiate from model class");
-                    }
-                    return false;
-                }).collect(Collectors.toList());
-
-        StringBuilder updater = new StringBuilder("UPDATE ")
-                .append(modelClass.getSimpleName())
-                .append(" SET ");
-        updater.append(fieldsToUpdate.stream()
-                .map(field -> field.getName() + "=?")
-                .collect(Collectors.joining(",")));
-        updater.append(" WHERE id=?");
-        log.info("Built update statement '{}'", updater);
-
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement updateStatement = connection.prepareStatement(updater.toString());
-            int i = 1;
-            for (Field field : fieldsToUpdate) {
-                String suffixGetterSetter = field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
-                        + field.getName().substring(1);
-                Method getter = modelClass.getDeclaredMethod("get" + suffixGetterSetter);
-                Object getterResult = getter.invoke(value);
-                Method setter = modelClass.getDeclaredMethod("set" + suffixGetterSetter,
-                        field.getType().isEnum() ? String.class : field.getType());
-                setter.invoke(oldValue, getterResult);
-                updateStatement.setObject(i++, getterResult);
-            }
-            updateStatement.setLong(i, id);
-            log.info("Executing statement");
-            updateStatement.executeUpdate();
-        } catch (SQLException e) {
-            log.error("SQL execution failed.");
-            throw new DatabaseException();
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            log.error("Could not instantiate from model class");
-            throw new ReflectionException();
-        }
-        return oldValue;
+    public boolean existsById(Long id) {
+        return findById(id).isPresent();
     }
 
     @Override
-    public boolean delete(Long id) {
-        if (findById(id) == null) {
-            return false;
+    public void deleteById(Long id) {
+        Optional<T> optionalT = findById(id);
+        if (!optionalT.isPresent()) {
+            return;
         }
 
         StringBuilder delete = new StringBuilder("DELETE FROM ");
@@ -303,7 +221,6 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             log.error("SQL execution failed: {}", e.toString());
             throw new DatabaseException();
         }
-        return true;
     }
 
     private T insert(T value, boolean idIsGiven) {
@@ -325,18 +242,31 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
         }
         inserter.append(')');
         log.info("Built insert statement '{}'", inserter);
+        return insertValue(inserter.toString(), value, idIsGiven);
+    }
 
+    private T insertValue(String inserter, T value, boolean withId) {
         try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement insertStatement = connection.prepareStatement(inserter.toString());
+            PreparedStatement insertStatement = connection.prepareStatement(inserter);
             int i = 1;
             for (Field field : fields) {
                 Method getter = modelClass.getDeclaredMethod("get"
                         + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + field.getName().substring(1));
                 Object getterResult = getter.invoke(value);
-                insertStatement.setObject(i++, getterResult);
+                if (field.getAnnotation(RefToOne.class) == null) {
+                    insertStatement.setObject(i++, getterResult);
+                } else {
+                    log.debug("get ID of object {}", getterResult);
+                    Method idGetter = field.getType().getMethod("getId");
+                    log.debug("ID getter found {}.", idGetter.getName());
+                    insertStatement.setObject(i++, idGetter.invoke(getterResult));
+                    log.debug("ID set to insert statement.");
+                }
             }
-            insertStatement.setLong(i, value.getId());
+            if (withId) {
+                insertStatement.setLong(i, value.getId());
+            }
             log.info("Executing statement");
             insertStatement.executeUpdate();
 
@@ -353,6 +283,64 @@ public abstract class AbstractJdbcDao<T extends BaseEntity> implements Dao<T> {
             log.error("Could not instantiate from model class");
             throw new ReflectionException();
         }
+
         return value;
+    }
+
+    private T update(T oldValue, T newValue) {
+        List<Field> fieldsToUpdate = fields.stream()
+                .filter(field -> {
+                    try {
+                        Method getter = modelClass.getDeclaredMethod("get"
+                                + field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                                + field.getName().substring(1));
+                        Object getterResult = getter.invoke(newValue);
+                        return getterResult != null;
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                        log.error("Could not instantiate from model class");
+                    }
+                    return false;
+                }).collect(Collectors.toList());
+        StringBuilder updater = new StringBuilder("UPDATE ")
+                .append(modelClass.getSimpleName())
+                .append(" SET ");
+        updater.append(fieldsToUpdate.stream()
+                .map(field -> field.getName() + "=?")
+                .collect(Collectors.joining(",")));
+        updater.append(" WHERE id=?");
+        log.info("Built update statement '{}'", updater);
+
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement updateStatement = connection.prepareStatement(updater.toString());
+            int i = 1;
+            for (Field field : fieldsToUpdate) {
+                String suffixGetterSetter = field.getName().substring(0, 1).toUpperCase(Locale.getDefault())
+                        + field.getName().substring(1);
+                Method getter = modelClass.getDeclaredMethod("get" + suffixGetterSetter);
+                Object getterResult = getter.invoke(newValue);
+                if (field.getAnnotation(RefToOne.class) == null) {
+                    updateStatement.setObject(i++, getterResult);
+                    Method setter = modelClass.getDeclaredMethod("set" + suffixGetterSetter,
+                            field.getType().isEnum() ? String.class : field.getType());
+                    setter.invoke(oldValue, getterResult);
+                } else {
+                    Method idGetter = field.getType().getDeclaredMethod("getId");
+                    Long refId = (Long) idGetter.invoke(getterResult);
+                    updateStatement.setLong(i++, refId);
+                    Method idSetter = modelClass.getDeclaredMethod("setId", Long.class);
+                    idSetter.invoke(oldValue, refId);
+                }
+            }
+            updateStatement.setLong(i, oldValue.getId());
+            log.info("Executing statement");
+            updateStatement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("SQL execution failed.");
+            throw new DatabaseException();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            log.error("Could not instantiate from model class");
+            throw new ReflectionException();
+        }
+        return oldValue;
     }
 }
