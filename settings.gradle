@@ -1,4 +1,4 @@
 rootProject.name = 'idde-paim1949'
 
 // almodulok definiciója relatív elérési útvonal szerint
-include 'paim1949-extra'
+include 'paim1949-extra', 'paim1949-backend', 'paim1949-desktop'
